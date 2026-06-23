@@ -422,8 +422,39 @@ A nested messaging thread (comments) and activity history timeline per support t
 
 ---
 
+### Stage 5 — Dashboard & Analytics API
+
+**What was built:**
+A comprehensive dashboard metrics aggregator, SLA breach tracking, and a student satisfaction rating feedback API.
+
+**Key features and how they work:**
+- **Dashboard Stats Aggregation:** Support reps can query overall support statistics. It calculates total tickets, state distribution counts, average response time (from `OPEN` to `IN_PROGRESS` based on timeline transition timestamps), average student satisfaction rating, SLA breach counts, and the top ticket category.
+- **Dynamic SLA Breach Check:** Evaluates ticket response deadlines based on priority thresholds (High priority: 24h, Medium priority: 48h, Low priority: 72h). Tickets that exceed these hours are dynamically updated and flagged as SLA breaches in the database.
+- **Student Satisfaction Ratings:** Students can submit a star rating feedback (1 to 5 stars) once their ticket status is resolved or closed. Submitting feedback inserts a SatisfactionRating record and registers a corresponding timeline event.
+- **Agent Satisfaction Matrix:** Support agents can view satisfaction score ranking lists tracking average star feedback scores and total ratings received per agent.
+
+**Files added/modified in this stage:**
+| File | Action | Purpose |
+|---|---|---|
+| `src/services/dashboard.service.js` | [NEW] | Handles database aggregation queries, SLA checking math, satisfaction rating creations, and agent stats |
+| `src/controllers/dashboard.controller.js` | [NEW] | Controller mapping feedback body schemas, stats, and breaches list payloads |
+| `src/routes/dashboard.routes.js` | [NEW] | Registers router endpoints for statistics and SLA queries with JSDoc OpenAPI specs |
+| `src/routes/request.routes.js` | [MODIFY] | Registers the ticket satisfaction feedback rating route (`POST /requests/:id/rate`) |
+| `src/server.js` | [MODIFY] | Mounts dashboard route endpoints under `/api/dashboard` |
+
+**API endpoints added:**
+| Method | URL | Protected By | Role Allowed | Description |
+|---|---|---|---|---|
+| POST | `/api/requests/:id/rate` | JWT | `STUDENT` | Submit a satisfaction star feedback rating (1-5) on a resolved ticket |
+| GET | `/api/dashboard/stats` | JWT | `SUPPORT` | Compiles global dashboard stats and averages |
+| GET | `/api/dashboard/sla-breaches` | JWT | `SUPPORT` | Lists all tickets exceeding response time SLA thresholds |
+| GET | `/api/dashboard/satisfaction` | JWT | `SUPPORT` | Compiles average satisfaction rating and feedback counts per agent |
+
+---
+
 ## License
 
 MIT — built as a professional interview assignment.
+
 
 
