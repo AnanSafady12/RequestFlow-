@@ -1,0 +1,148 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Light Mode Design System */
+    --background: 248 250 252; /* Slate 50 */
+    --foreground: 15 23 42;    /* Slate 900 */
+
+    --card: 255 255 255;       /* Pure White */
+    --card-foreground: 15 23 42;
+
+    --popover: 255 255 255;
+    --popover-foreground: 15 23 42;
+
+    --primary: 37 99 235;      /* Blue 600 (Premium blue) */
+    --primary-foreground: 255 255 255;
+
+    --secondary: 241 245 249;  /* Slate 100 */
+    --secondary-foreground: 15 23 42;
+
+    --muted: 241 245 249;
+    --muted-foreground: 100 116 139; /* Slate 500 */
+
+    --accent: 241 245 249;
+    --accent-foreground: 15 23 42;
+
+    --destructive: 239 68 68;   /* Red 500 */
+    --destructive-foreground: 255 255 255;
+
+    --border: 226 232 240;      /* Slate 200 */
+    --input: 226 232 240;
+    --ring: 37 99 235;          /* Blue 600 */
+
+    --radius: 0.75rem;          /* Smoother border radius */
+  }
+
+  .dark {
+    /* Dark Mode Design System (Wow Factor Dark Blue-Slate Palette) */
+    --background: 9 15 29;     /* Premium deep space blue */
+    --foreground: 248 250 252;  /* Slate 50 */
+
+    --card: 17 24 43;          /* Dark card container */
+    --card-foreground: 248 250 252;
+
+    --popover: 17 24 43;
+    --popover-foreground: 248 250 252;
+
+    --primary: 99 102 241;     /* Indigo 500 (Vibrant active blue) */
+    --primary-foreground: 255 255 255;
+
+    --secondary: 30 41 59;     /* Slate 800 */
+    --secondary-foreground: 248 250 252;
+
+    --muted: 30 41 59;
+    --muted-foreground: 148 163 184; /* Slate 400 */
+
+    --accent: 30 41 59;
+    --accent-foreground: 248 250 252;
+
+    --destructive: 239 68 68;
+    --destructive-foreground: 255 255 255;
+
+    --border: 30 41 59;        /* Slate 800 */
+    --input: 30 41 59;
+    --ring: 99 102 241;        /* Indigo 500 */
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased font-sans transition-colors duration-300;
+  }
+}
+
+/* ─────────────────────────────────────────────
+   CUSTOM UTILITY CLASSES (Rich Aesthetics)
+   ───────────────────────────────────────────── */
+
+/* Glassmorphism background blur effects */
+.glass-panel {
+  background-color: rgba(var(--card) / 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(var(--border) / 0.5);
+}
+
+.glass-nav {
+  background-color: rgba(var(--background) / 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(var(--border) / 0.5);
+}
+
+/* Elegant custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(var(--muted-foreground) / 0.2);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(var(--muted-foreground) / 0.4);
+}
+
+/* Fade in animation for routing and element loading */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Subtle pulse for pending indicators */
+.status-indicator-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: .5;
+    transform: scale(1.1);
+  }
+}
