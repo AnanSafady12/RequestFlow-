@@ -4,6 +4,8 @@
 
 const prisma = require('../config/db');
 const { logActivity } = require('../utils/activityLogger');
+const notificationService = require('./notification.service');
+const { sendToUser, getIO } = require('../sockets/socket');
 
 class RequestService {
   /**
@@ -296,6 +298,42 @@ class RequestService {
     // Write all activity log entries
     for (const log of logDetails) {
       await logActivity(log.action, log.description, userId, requestId);
+    }
+
+    // Trigger in-app notifications and real-time Socket updates
+    try {
+      if (status && status !== existing.status) {
+        await notificationService.createNotification(
+          existing.studentId,
+          `Your ticket "${existing.title}" status is now ${status}`,
+          'STATUS_UPDATE',
+          requestId
+        );
+      }
+      if (priority && priority !== existing.priority) {
+        await notificationService.createNotification(
+          existing.studentId,
+          `Your ticket "${existing.title}" priority has changed to ${priority}`,
+          'PRIORITY_UPDATE',
+          requestId
+        );
+      }
+      if (assignedToId !== undefined && assignedToId !== existing.assignedToId && assignedToId !== null) {
+        await notificationService.createNotification(
+          existing.studentId,
+          `Your ticket "${existing.title}" has been assigned.`,
+          'ASSIGNEE_UPDATE',
+          requestId
+        );
+      }
+
+      // Send Socket.io event to the student for live updates
+      sendToUser(existing.studentId, 'request:updated', { requestId, updates });
+
+      // Also broadcast to support room so other agents looking at dashboard get live updates
+      getIO().to('support_room').emit('request:updated', { requestId, updates });
+    } catch (notifyErr) {
+      console.error('⚠️  Failed to trigger update notifications:', notifyErr.message);
     }
 
     return this.getRequestById(requestId, userId, 'SUPPORT');

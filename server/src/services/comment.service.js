@@ -3,6 +3,8 @@
 
 const prisma = require('../config/db');
 const { logActivity } = require('../utils/activityLogger');
+const notificationService = require('./notification.service');
+const { sendToUser, getIO } = require('../sockets/socket');
 
 class CommentService {
   /**
@@ -66,6 +68,45 @@ class CommentService {
       : `${author.name} added a comment`;
 
     await logActivity('COMMENT_ADDED', logDesc, authorId, requestId);
+
+    // Trigger in-app notifications and real-time Socket updates
+    try {
+      if (commentIsInternal) {
+        // Internal comment from support rep
+        // Broadcast comment to the support_room room so other support reps online get it live
+        getIO().to('support_room').emit('comment:new', comment);
+      } else {
+        // Public comment
+        if (authorRole === 'STUDENT') {
+          // Student commented -> notify the assigned support rep (if any)
+          if (request.assignedToId) {
+            await notificationService.createNotification(
+              request.assignedToId,
+              `${author.name} commented on ticket "${request.title}"`,
+              'NEW_COMMENT',
+              requestId
+            );
+            sendToUser(request.assignedToId, 'comment:new', comment);
+          }
+          // Also broadcast to support_room so any online agent currently looking at the request sees it
+          getIO().to('support_room').emit('comment:new', comment);
+        } else {
+          // Support rep commented publicly -> notify the student
+          await notificationService.createNotification(
+            request.studentId,
+            `Support agent "${author.name}" commented on ticket "${request.title}"`,
+            'NEW_COMMENT',
+            requestId
+          );
+          sendToUser(request.studentId, 'comment:new', comment);
+          
+          // Also send to support_room so other online support agents looking at the ticket see it
+          getIO().to('support_room').emit('comment:new', comment);
+        }
+      }
+    } catch (notifyErr) {
+      console.error('⚠️  Failed to trigger comment notifications:', notifyErr.message);
+    }
 
     return comment;
   }

@@ -21,6 +21,10 @@ const app = express();
 // We need this so Socket.io can attach to the same server in Stage 6.
 const httpServer = createServer(app);
 
+// Initialize Socket.io real-time engine
+const { initSocket } = require('./sockets/socket');
+initSocket(httpServer);
+
 // ─────────────────────────────────────────────
 // MIDDLEWARE — code that runs on EVERY request
 // before it reaches the route handler
@@ -133,6 +137,10 @@ app.use('/api/requests', requestRoutes);
 // Dashboard routes — statistics, SLA metrics, agent ratings
 const dashboardRoutes = require('./routes/dashboard.routes');
 app.use('/api/dashboard', dashboardRoutes);
+
+// Notification routes — list and mark read states
+const notificationRoutes = require('./routes/notification.routes');
+app.use('/api/notifications', notificationRoutes);
 
 // Serve the uploads directory statically so files can be accessed or downloaded
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));

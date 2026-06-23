@@ -452,9 +452,41 @@ A comprehensive dashboard metrics aggregator, SLA breach tracking, and a student
 
 ---
 
+### Stage 6 — Real-Time Features (WebSockets)
+
+**What was built:**
+Full Socket.io real-time server integration facilitating instant in-app alerts, dynamic updates, and support agent tracking of online users.
+
+**Key features and how they work:**
+- **Secure Socket Connections:** Socket handshakes require authentication. A client connects by passing a JWT token in `auth.token`, verified on connection via `jsonwebtoken`. Invalid or expired tokens result in socket disconnection.
+- **Dynamic Notifications & Alerts:** When a support agent modifies a ticket (status, priority, assignee changes) or posts a public comment, an in-app `Notification` record is saved to the database, and a real-time `notification:new` and `request:updated` / `comment:new` event is pushed instantly to the student.
+- **Support-Only Room & Online Roster:** Support reps connect to a designated `support_room` room. Connecting and disconnecting events dynamically maintain an online roster. Support reps receive live lists containing all currently connected students and agents (`users:online` event) without manual refreshing.
+- **Graceful Notification Fallback:** The notification service failsafe captures error bounds, ensuring a failure in real-time emissions does not crash standard HTTP response workflows.
+
+**Files added/modified in this stage:**
+| File | Action | Purpose |
+|---|---|---|
+| `src/sockets/socket.js` | [NEW] | Initializes Socket.io, verifies handshakes, maps active connections, and manages rooms |
+| `src/services/notification.service.js` | [NEW] | Persists notifications to DB and emits socket notification events to targets |
+| `src/controllers/notification.controller.js` | [NEW] | Exposes notifications queries and read operations |
+| `src/routes/notification.routes.js` | [NEW] | Registers notification paths with their Swagger annotations |
+| `src/services/request.service.js` | [MODIFY] | Triggers notifications and socket updates when tickets undergo mutations |
+| `src/services/comment.service.js` | [MODIFY] | Triggers comment-added events for students and broadcasts internal notes to reps |
+| `src/server.js` | [MODIFY] | Mounts notifications API routes under `/api/notifications` and initializes socket manager |
+
+**API endpoints added:**
+| Method | URL | Protected By | Role Allowed | Description |
+|---|---|---|---|---|
+| GET | `/api/notifications` | JWT | Anyone | List all notifications for the authenticated user |
+| POST | `/api/notifications/read-all` | JWT | Anyone | Mark all user notifications as read |
+| PATCH | `/api/notifications/:id/read` | JWT | Anyone | Mark a single notification as read |
+
+---
+
 ## License
 
 MIT — built as a professional interview assignment.
+
 
 
 
