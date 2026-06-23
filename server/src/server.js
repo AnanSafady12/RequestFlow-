@@ -78,13 +78,48 @@ app.get('/api/health', (req, res) => {
 });
 
 // ─────────────────────────────────────────────
-// ROUTES — will be imported and connected in later stages
+// SWAGGER API DOCUMENTATION SETUP
+// Swagger reads the JSDoc comments in our route files
+// and generates an interactive API docs page at /api/docs
 // ─────────────────────────────────────────────
 
-// Placeholder — routes will be added in Stage 2, 3, 4, 5
-// app.use('/api/auth', authRoutes);
-// app.use('/api/requests', requestRoutes);
-// app.use('/api/dashboard', dashboardRoutes);
+const swaggerJsdoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
+
+const swaggerOptions = {
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'RequestFlow API',
+      version: '1.0.0',
+      description: 'Support Request Management System for College Students',
+    },
+    servers: [{ url: '/api' }],
+    // This tells Swagger that protected routes need a Bearer token
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+        },
+      },
+    },
+  },
+  // Tell Swagger where to find the JSDoc comments (in all route files)
+  apis: ['./src/routes/*.js'],
+};
+
+const swaggerSpec = swaggerJsdoc(swaggerOptions);
+app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+// ─────────────────────────────────────────────
+// ROUTES
+// ─────────────────────────────────────────────
+
+// Auth routes — register, login, verify code, resend code, get me
+const authRoutes = require('./routes/auth.routes');
+app.use('/api/auth', authRoutes);
 
 // ─────────────────────────────────────────────
 // 404 HANDLER — catches requests to unknown routes
