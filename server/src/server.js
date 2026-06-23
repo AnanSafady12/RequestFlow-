@@ -10,6 +10,7 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const { createServer } = require('http');
 const dotenv = require('dotenv');
+const path = require('path');
 
 // Load the .env file so process.env has all our config values
 dotenv.config();
@@ -41,6 +42,10 @@ app.use(
 // express.json() reads the body of incoming requests and parses JSON
 // Without this, req.body would be undefined
 app.use(express.json());
+
+// Custom request logger — captures user ID, method, URL, status, and duration
+const { requestLogger } = require('./middleware/logging');
+app.use(requestLogger);
 
 // morgan logs every request to the terminal in a readable format
 // Example: POST /api/auth/login 200 45ms
@@ -120,6 +125,13 @@ app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 // Auth routes — register, login, verify code, resend code, get me
 const authRoutes = require('./routes/auth.routes');
 app.use('/api/auth', authRoutes);
+
+// Request routes — full CRUD, search, filter, file upload support
+const requestRoutes = require('./routes/request.routes');
+app.use('/api/requests', requestRoutes);
+
+// Serve the uploads directory statically so files can be accessed or downloaded
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // ─────────────────────────────────────────────
 // 404 HANDLER — catches requests to unknown routes

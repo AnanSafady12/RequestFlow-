@@ -362,6 +362,41 @@ POST /api/requests/:id  →  authenticate  →  authorize('SUPPORT')  →  handl
 
 ---
 
+### Stage 3 — Requests API
+
+**What was built:**
+Full CRUD API for support requests with advanced search, filtering, role-based access, file upload support, custom request logging, and automatic activity history logs.
+
+**Key features and how they work:**
+- **Request Creation with Attachments:** Students can create support requests. If they upload a file (images or PDF up to 5MB), the system uses `multer` to save it to disk under `server/uploads/` with a unique timestamped filename, creating an attachment record in the database linked to the request.
+- **Role-Based List and Scope:** Students can ONLY list and view their own requests. Support reps can list and view all requests in the system.
+- **Search & Filtering:** Supports searching request titles and descriptions (case-insensitive) along with filtering by status, priority, category, date range, or student ID.
+- **Role-Based Management (Support-Only updates):** Support reps can update status, priority, and assignees. This is restricted from students.
+- **Auto Activity Logs (Request Timeline):** Every major action (request creation, status update, priority change, or assignee modification) automatically logs an entry in the `Activity` table to compile a real-time historical timeline for the ticket.
+- **Custom requestLogger Middleware:** Tracks and prints method, requested URL, response status, authenticated user ID, and response duration in milliseconds.
+
+**Files added in this stage:**
+| File | Purpose |
+|---|---|
+| `src/middleware/upload.js` | Configures Multer storage, file filtering, and size limit requirements |
+| `src/middleware/logging.js` | Custom middleware that prints a detailed log of every request-response cycle |
+| `src/utils/activityLogger.js` | Failsafe utility to log timeline entries into the Activity table |
+| `src/services/request.service.js` | Business logic layer containing DB transactions, filters, and validations |
+| `src/controllers/request.controller.js` | Controller mapping request data, error catches, and role verifications |
+| `src/routes/request.routes.js` | Defines the API routes, Multer wrapper, and JSDoc OpenAPI specs |
+
+**API endpoints added:**
+| Method | URL | Protected By | Role Allowed | Description |
+|---|---|---|---|---|
+| POST | `/api/requests` | JWT | `STUDENT` | Creates a new request (optional file upload) |
+| GET | `/api/requests` | JWT | `STUDENT` or `SUPPORT` | Lists/filters requests (scoped by role) |
+| GET | `/api/requests/search` | JWT | `STUDENT` or `SUPPORT` | Alias to filter and search requests |
+| GET | `/api/requests/:id` | JWT | `STUDENT` (own) or `SUPPORT` (all) | Retrieve request details and activity log |
+| PATCH | `/api/requests/:id` | JWT | `SUPPORT` | Update status, priority, or assign support rep |
+
+---
+
 ## License
 
 MIT — built as a professional interview assignment.
+
