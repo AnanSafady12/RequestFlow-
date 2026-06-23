@@ -11,6 +11,7 @@ import VerifyEmail from './pages/VerifyEmail';
 import StudentDashboard from './pages/StudentDashboard';
 import StudentRequests from './pages/StudentRequests';
 import CreateRequest from './pages/CreateRequest';
+import RequestDetails from './pages/RequestDetails';
 import SupportDashboard from './pages/SupportDashboard';
 import SupportRequests from './pages/SupportRequests';
 import Unauthorized from './pages/Unauthorized';
@@ -38,6 +39,7 @@ export default function App() {
           <Route path="/student" element={<StudentDashboard />} />
           <Route path="/student/requests" element={<StudentRequests />} />
           <Route path="/student/requests/new" element={<CreateRequest />} />
+          <Route path="/student/requests/:id" element={<RequestDetails />} />
         </Route>
       </Route>
 

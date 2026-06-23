@@ -178,7 +178,7 @@ export default function Register() {
                   <ShieldAlert size={20} className={role === 'SUPPORT' ? 'text-primary' : 'text-muted-foreground'} />
                   <div className="mt-2">
                     <p className="text-xs font-bold leading-none">Support Staff</p>
-                    <p className="text-[10px] text-muted-foreground mt-0.5">Manage & assign tickets</p>
+                    <p className="text-[10px] text-muted-foreground mt-0.5">Manage & assign requests</p>
                   </div>
                 </button>
               </div>
