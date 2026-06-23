@@ -1,0 +1,1 @@
+# middleware runs before each request reaches the controller (auth, logging, etc.)

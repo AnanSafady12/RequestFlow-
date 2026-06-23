@@ -1,0 +1,29 @@
+# .aiexclude
+# This file tells AI coding assistants (like Gemini, Copilot, etc.)
+# which files they are NOT allowed to read.
+# We exclude secret files so no AI tool ever sees our passwords or keys.
+
+# Never read real environment variable files (they contain secrets)
+.env
+.env.*
+server/.env
+client/.env
+
+# Never read uploaded user files
+server/uploads/
+
+# Never read test coverage reports
+coverage/
+
+# Never read build output folders
+dist/
+build/
+.next/
+
+# Never read log files
+*.log
+logs/
+
+# Never read the database itself if we ever export it
+*.sql
+*.dump

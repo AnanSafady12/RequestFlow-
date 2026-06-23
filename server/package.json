@@ -1,0 +1,14 @@
+{
+  "name": "requestflow-server",
+  "version": "1.0.0",
+  "description": "RequestFlow backend — Node.js + Express + PostgreSQL",
+  "main": "src/server.js",
+  "scripts": {
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js",
+    "seed": "node prisma/seed.js",
+    "test": "jest --runInBand"
+  },
+  "keywords": ["requestflow", "support", "tickets", "nodejs", "express"],
+  "license": "MIT"
+}
