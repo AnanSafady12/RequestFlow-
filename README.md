@@ -560,6 +560,27 @@ Production-ready authentication views styled with glassmorphism overlays, form v
 
 ---
 
+### Stage 11 — Student UI
+
+**What was built:**
+The complete student-facing workspace including the main landing dashboard with aggregated metrics, a filtered ticket search and listings table, a multipart ticket creation form with attachments, and an interactive conversation detail workspace.
+
+**Key features and how they work:**
+- **Calculated Dashboard Metrics:** Since admin dashboard APIs are blocked for student roles, the landing student dashboard compiles stats counts (total, open, resolved, closed) directly from the retrieved array of student requests in the client-side state.
+- **Advanced Query Filters:** The listings index features synchronous text search and dropdown status, category, and priority filters that dynamically trigger debounced backend requests.
+- **Multipart Form Submissions:** The creation form gathers title, description, category, and priority options, and appends them alongside an optional file binary using browser `FormData` to handle multipart uploads securely.
+- **Chronological Discussion Timeline:** The workspace dynamically fetches comments and activity logs and merges them into a single sorted chronological feed. Student comments are rendered on the right with a vibrant primary color while updates and assignee events render as centered system activity rows.
+- **Interactive Feedback Rating:** Renders a 5-star rating feedback widget on resolved/closed tickets allowing students to submit satisfaction feedback immediately, locking down the selected score once saved.
+
+**Files added/modified in this stage:**
+- [App.jsx](file:///Users/anansafady/CS%20/VS%20code%20projects/RequestFlow%20/RequestFlow-/client/src/App.jsx) [MODIFY] — Registered the detailed request view route.
+- [StudentDashboard.jsx](file:///Users/anansafady/CS%20/VS%20code%20projects/RequestFlow%20/RequestFlow-/client/src/pages/StudentDashboard.jsx) [MODIFY] — Displays ticket summary counts and quick links.
+- [StudentRequests.jsx](file:///Users/anansafady/CS%20/VS%20code%20projects/RequestFlow%20/RequestFlow-/client/src/pages/StudentRequests.jsx) [MODIFY] — Search input, category filters, and requests tables.
+- [CreateRequest.jsx](file:///Users/anansafady/CS%20/VS%20code%20projects/RequestFlow%20/RequestFlow-/client/src/pages/CreateRequest.jsx) [MODIFY] — Urgency selections, validation, and attachment upload fields.
+- [RequestDetails.jsx](file:///Users/anansafady/CS%20/VS%20code%20projects/RequestFlow%20/RequestFlow-/client/src/pages/RequestDetails.jsx) [NEW] — Single ticket conversation workspace and rating widget.
+
+---
+
 ## License
 
 MIT — built as a professional interview assignment.

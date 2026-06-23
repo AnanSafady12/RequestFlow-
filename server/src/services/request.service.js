@@ -47,13 +47,26 @@ class RequestService {
 
     // Create the request and optional attachment in a transaction
     const newRequest = await prisma.$transaction(async (tx) => {
+      // Automatically map priority based on category:
+      // ADMIN, FINANCIAL, MEDICAL_APPROVAL -> HIGH
+      // EXAMS -> MEDIUM
+      // ENGLISH_DEPARTMENT -> LOW
+      let mappedPriority = 'LOW';
+      if (category === 'ADMIN' || category === 'FINANCIAL' || category === 'MEDICAL_APPROVAL') {
+        mappedPriority = 'HIGH';
+      } else if (category === 'EXAMS') {
+        mappedPriority = 'MEDIUM';
+      } else if (category === 'ENGLISH_DEPARTMENT') {
+        mappedPriority = 'LOW';
+      }
+
       // 1. Create the request record
       const request = await tx.request.create({
         data: {
           title,
           description,
           category,
-          priority: priority || 'LOW',
+          priority: mappedPriority,
           studentId,
         },
       });
