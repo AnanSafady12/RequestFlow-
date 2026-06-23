@@ -130,6 +130,10 @@ app.use('/api/auth', authRoutes);
 const requestRoutes = require('./routes/request.routes');
 app.use('/api/requests', requestRoutes);
 
+// Dashboard routes — statistics, SLA metrics, agent ratings
+const dashboardRoutes = require('./routes/dashboard.routes');
+app.use('/api/dashboard', dashboardRoutes);
+
 // Serve the uploads directory statically so files can be accessed or downloaded
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 

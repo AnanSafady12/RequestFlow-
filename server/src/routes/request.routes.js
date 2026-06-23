@@ -8,6 +8,7 @@ const { authenticate } = require('../middleware/authenticate');
 const { authorize } = require('../middleware/authorize');
 const { upload } = require('../middleware/upload');
 const commentController = require('../controllers/comment.controller');
+const dashboardController = require('../controllers/dashboard.controller');
 
 const router = Router();
 
@@ -338,5 +339,47 @@ router.get('/:id/comments', authenticate, commentController.getComments);
  *         description: Request not found
  */
 router.get('/:id/activity', authenticate, commentController.getActivityTimeline);
+
+/**
+ * @swagger
+ * /requests/{id}/rate:
+ *   post:
+ *     summary: Submit student satisfaction rating feedback (Student only)
+ *     tags: [Requests]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Request ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [rating]
+ *             properties:
+ *               rating:
+ *                 type: integer
+ *                 minimum: 1
+ *                 maximum: 5
+ *                 example: 5
+ *     responses:
+ *       200:
+ *         description: Rating saved successfully
+ *       400:
+ *         description: Invalid rating or ticket is not resolved/closed yet
+ *       401:
+ *         description: Not authenticated
+ *       403:
+ *         description: Access denied (only student who opened the ticket can rate it)
+ *       404:
+ *         description: Request not found
+ */
+router.post('/:id/rate', authenticate, authorize('STUDENT'), dashboardController.rateRequest);
 
 module.exports = router;
