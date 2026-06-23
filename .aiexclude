@@ -27,3 +27,5 @@ logs/
 # Never read the database itself if we ever export it
 *.sql
 *.dump
+
+
