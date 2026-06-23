@@ -498,6 +498,36 @@ All Swagger integrations were coded dynamically during endpoint design cycles. N
 
 ---
 
+### Stage 8 — Backend Tests (Jest)
+
+**What was built:**
+A comprehensive automated integration and unit test suite containing 30 test cases written in Jest and Supertest, verifying all authentication flows, request CRUD operations and role permissions, dashboard analytics, SLA calculations, and in-app notifications.
+
+**Key features and how they work:**
+- **Database Isolation:** Programmed dynamic redirection of `DATABASE_URL` inside `tests/setup.js` to automatically target a separate database `requestflow_test` during runs. This protects your development database (`requestflow_db`) from getting wiped or having seed records deleted.
+- **Auto-Sync Schema:** The setup script automatically triggers `npx prisma db push` before running tests to guarantee the test database has the latest PostgreSQL tables without manual intervention.
+- **Fast Mocking:** Globally mocked the `sendEmail.js` Nodemailer utility to bypass SMTP connections, allowing tests to run rapidly and offline.
+- **Clean State Isolation:** A database table cleaner runs in `beforeEach()` to wipe test data, guaranteeing clean environment starting blocks for every single test case.
+- **Test Coverage:** Covers registration, code verification, login, current user lookup (`/me`), request creation permissions (student-only), scoped listing views (students see own, support reps see all), comments scoping (public comments for students, public + internal comments for support), dynamic SLA breach checks on overdue tickets, average agent rating scoring, and notifications reading.
+
+**How to run tests:**
+Navigate to the `server/` directory and run:
+```bash
+npm test
+```
+
+**Files added/modified in this stage:**
+- [package.json](file:///Users/anansafady/CS%20/VS%20code%20projects/RequestFlow%20/RequestFlow-/server/package.json) [MODIFY] — Configured Jest `setupFilesAfterEnv` path.
+- [server.js](file:///Users/anansafady/CS%20/VS%20code%20projects/RequestFlow%20/RequestFlow-/server/src/server.js) [MODIFY] — Prevented starting HTTP server on ports during testing.
+- [request.controller.js](file:///Users/anansafady/CS%20/VS%20code%20projects/RequestFlow%20/RequestFlow-/server/src/controllers/request.controller.js) [MODIFY] — Handled invalid category/priority errors in response code formatting.
+- [setup.js](file:///Users/anansafady/CS%20/VS%20code%20projects/RequestFlow%20/RequestFlow-/server/tests/setup.js) [NEW] — Dynamic DB router, global mock definitions, schema syncing, and DB table wipes.
+- [auth.test.js](file:///Users/anansafady/CS%20/VS%20code%20projects/RequestFlow%20/RequestFlow-/server/tests/auth.test.js) [NEW] — Tests for the auth system endpoints.
+- [requests.test.js](file:///Users/anansafady/CS%20/VS%20code%20projects/RequestFlow%20/RequestFlow-/server/tests/requests.test.js) [NEW] — Tests for request creation, visibility, comment separations, and rating submissions.
+- [dashboard.test.js](file:///Users/anansafady/CS%20/VS%20code%20projects/RequestFlow%20/RequestFlow-/server/tests/dashboard.test.js) [NEW] — Tests for dashboard analytics compilation, SLA overdue thresholds, and agent satisfaction tracking.
+- [notifications.test.js](file:///Users/anansafady/CS%20/VS%20code%20projects/RequestFlow%20/RequestFlow-/server/tests/notifications.test.js) [NEW] — Tests for notification lists and read state updates.
+
+---
+
 ## License
 
 MIT — built as a professional interview assignment.

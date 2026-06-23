@@ -185,12 +185,14 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 3000;
 
-httpServer.listen(PORT, () => {
-  console.log(`\n🚀 RequestFlow server running on http://localhost:${PORT}`);
-  console.log(`📚 API Docs: http://localhost:${PORT}/api/docs`);
-  console.log(`❤️  Health:  http://localhost:${PORT}/api/health`);
-  console.log(`🌍 Environment: ${process.env.NODE_ENV}\n`);
-});
+if (process.env.NODE_ENV !== 'test') {
+  httpServer.listen(PORT, () => {
+    console.log(`\n🚀 RequestFlow server running on http://localhost:${PORT}`);
+    console.log(`📚 API Docs: http://localhost:${PORT}/api/docs`);
+    console.log(`❤️  Health:  http://localhost:${PORT}/api/health`);
+    console.log(`🌍 Environment: ${process.env.NODE_ENV}\n`);
+  });
+}
 
 // Export for Jest testing — tests need to import the server
 module.exports = { app, httpServer };
