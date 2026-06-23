@@ -396,7 +396,34 @@ Full CRUD API for support requests with advanced search, filtering, role-based a
 
 ---
 
+### Stage 4 — Comments & Activity Timeline
+
+**What was built:**
+A nested messaging thread (comments) and activity history timeline per support ticket, supporting public comments for general communication and internal notes restricted strictly to support representatives.
+
+**Key features and how they work:**
+- **Double-Layered Comments Thread:** Students and support representatives can communicate in real time on tickets. Support representatives have the option to set an `isInternal: true` flag to post private administrative notes that other support agents can see, but students cannot.
+- **Data Leak Prevention (Privacy Scoping):** If a student attempts to query comments or activity timelines, the backend automatically intercepts and filters out comments marked as internal, along with any activity log entries related to internal updates (such as "John Support added an internal note").
+- **Auto Activity Log Tracking:** Posting a public or internal comment automatically records a corresponding event tracking log in the request's historical ledger.
+
+**Files added/modified in this stage:**
+| File | Action | Purpose |
+|---|---|---|
+| `src/services/comment.service.js` | [NEW] | Handles comment creations, visibility scoping by user role, and timeline history listings |
+| `src/controllers/comment.controller.js` | [NEW] | Controller mapping comment params, internal toggles, and status/security catches |
+| `src/routes/request.routes.js` | [MODIFY] | Registers nested paths (`/requests/:id/comments` and `/requests/:id/activity`) with their OpenAPI annotations |
+
+**API endpoints added:**
+| Method | URL | Protected By | Role Allowed | Description |
+|---|---|---|---|---|
+| POST | `/api/requests/:id/comments` | JWT | `STUDENT` (own) or `SUPPORT` (all) | Appends a comment to a request (support can toggle `isInternal`) |
+| GET | `/api/requests/:id/comments` | JWT | `STUDENT` (own) or `SUPPORT` (all) | Lists all comments (scoped/filtered by role visibility) |
+| GET | `/api/requests/:id/activity` | JWT | `STUDENT` (own) or `SUPPORT` (all) | Returns the ticket's activity timeline (internal notes logs hidden from student) |
+
+---
+
 ## License
 
 MIT — built as a professional interview assignment.
+
 
