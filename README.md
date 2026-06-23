@@ -483,9 +483,25 @@ Full Socket.io real-time server integration facilitating instant in-app alerts, 
 
 ---
 
+### Stage 7 — Swagger API Documentation
+
+**What was built:**
+A comprehensive interactive Swagger documentation page served dynamically at `/api/docs` exposing all Auth, Requests, Comments, Feedback, and Notifications API endpoints.
+
+**Key features and how they work:**
+- **Dynamic OpenAPI Specs Generation:** Integrated `swagger-jsdoc` and `swagger-ui-express` to compile JSDoc inline endpoint comments in route files.
+- **Bearer JWT Authentication Integration:** The documentation page supports interactive JWT authentication. Developers can submit their Bearer token in the Swagger UI components to execute authorized requests.
+- **Detailed Parameter & Schema Documentation:** Outlined input body parameters, query filter parameters, path parameters, and status responses (200, 201, 400, 401, 403, 404) for all available paths.
+
+**Files added/modified in this stage:**
+All Swagger integrations were coded dynamically during endpoint design cycles. No new modifications were needed for this stage as all 4 route files are fully documented and exposed.
+
+---
+
 ## License
 
 MIT — built as a professional interview assignment.
+
 
 
 

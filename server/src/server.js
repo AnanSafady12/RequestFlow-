@@ -31,8 +31,12 @@ initSocket(httpServer);
 // ─────────────────────────────────────────────
 
 // helmet adds security headers to every response automatically
-// It protects against common web attacks (XSS, clickjacking, etc.)
-app.use(helmet());
+// We disable contentSecurityPolicy because Swagger UI uses inline scripts and styles that would otherwise be blocked by the browser.
+app.use(
+  helmet({
+    contentSecurityPolicy: false,
+  })
+);
 
 // cors allows our React frontend to make requests to this backend
 // Without this, the browser would block all API calls from a different port
