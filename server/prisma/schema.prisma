@@ -1,0 +1,203 @@
+// This is the Prisma schema file.
+// It defines all the tables in our PostgreSQL database.
+// When you run "npx prisma migrate dev", Prisma reads this file
+// and creates the actual tables in the database automatically.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  // Prisma reads the DATABASE_URL from our .env file
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────────
+// ENUMS — these are fixed lists of allowed values
+// ─────────────────────────────────────────────
+
+// The two types of users in the system
+enum Role {
+  STUDENT
+  SUPPORT
+}
+
+// The lifecycle of a request — it moves forward, never backward randomly
+enum RequestStatus {
+  OPEN        // just created, nobody is working on it yet
+  IN_PROGRESS // a support rep picked it up
+  RESOLVED    // the issue was fixed
+  CLOSED      // fully done, no more action needed
+}
+
+// How urgent a request is
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+// The categories a student can choose when opening a request
+enum Category {
+  ADMIN               // administrative issues
+  FINANCIAL           // tuition, fees, scholarships
+  EXAMS               // exam scheduling, grades, appeals
+  ENGLISH_DEPARTMENT  // language course issues
+  MEDICAL_APPROVAL    // medical certificates and exemptions
+}
+
+// ─────────────────────────────────────────────
+// TABLES
+// ─────────────────────────────────────────────
+
+// User — stores both students and support reps in one table
+// We use the "role" field to tell them apart
+model User {
+  id        String   @id @default(uuid()) // unique ID, auto-generated
+  name      String
+  email     String   @unique              // no two users can have the same email
+  password  String                        // stored as a bcrypt hash, never plain text
+  role      Role     @default(STUDENT)    // default is student
+
+  // Email verification — we send a 6-digit code, store it here
+  isVerified            Boolean   @default(false) // account is locked until verified
+  verificationCode      String?                   // the 6-digit code (null after verified)
+  verificationCodeExpiry DateTime?                // code expires after 10 minutes
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations — things connected to this user
+  requests         Request[]           @relation("StudentRequests")  // requests opened BY this user (if student)
+  assignedRequests Request[]           @relation("AssignedRequests") // requests assigned TO this user (if support)
+  comments         Comment[]
+  activities       Activity[]
+  notifications    Notification[]
+  ratings          SatisfactionRating[]
+  attachments      Attachment[]        // files uploaded by this user
+}
+
+// Request — the main item in the system (what students submit)
+model Request {
+  id          String        @id @default(uuid())
+  title       String
+  description String
+  status      RequestStatus @default(OPEN)
+  priority    Priority      @default(LOW)
+  category    Category
+
+  // The student who opened this request
+  studentId   String
+  student     User          @relation("StudentRequests", fields: [studentId], references: [id])
+
+  // The support rep assigned to handle it (optional — starts as null)
+  assignedToId String?
+  assignedTo   User?        @relation("AssignedRequests", fields: [assignedToId], references: [id])
+
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  // SLA breach flag — set to true by the system if response time is exceeded
+  isSlaBreached Boolean     @default(false)
+
+  // Relations
+  comments     Comment[]
+  attachments  Attachment[]
+  activities   Activity[]
+  notifications Notification[]
+  rating       SatisfactionRating?
+}
+
+// Comment — messages added to a request by either the student or support
+model Comment {
+  id         String   @id @default(uuid())
+  content    String
+
+  // isInternal = true means only support reps can see this comment
+  // Used for internal notes between support staff
+  isInternal Boolean  @default(false)
+
+  // Who wrote this comment
+  authorId   String
+  author     User     @relation(fields: [authorId], references: [id])
+
+  // Which request this comment belongs to
+  requestId  String
+  request    Request  @relation(fields: [requestId], references: [id], onDelete: Cascade)
+
+  createdAt  DateTime @default(now())
+}
+
+// Attachment — files that students (or support) attach to a request
+model Attachment {
+  id           String   @id @default(uuid())
+  filename     String   // the name saved on disk (e.g. "uuid-original.png")
+  originalName String   // the name the user gave it (e.g. "my-screenshot.png")
+  mimetype     String   // file type (e.g. "image/png", "application/pdf")
+  size         Int      // file size in bytes
+
+  // Who uploaded this file
+  uploadedById String
+  uploadedBy   User    @relation(fields: [uploadedById], references: [id])
+
+  // Which request this file belongs to
+  requestId    String
+  request      Request @relation(fields: [requestId], references: [id], onDelete: Cascade)
+
+  createdAt    DateTime @default(now())
+}
+
+// Activity — auto-generated log of everything that happens on a request
+// This builds the "timeline" shown on the request detail page
+// It is written automatically by the backend — no user writes to it directly
+model Activity {
+  id          String   @id @default(uuid())
+  action      String   // short label like "STATUS_CHANGED" or "COMMENT_ADDED"
+  description String   // human-readable text like "Status changed from Open to In Progress"
+
+  // Which user caused this activity
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+
+  // Which request this activity belongs to
+  requestId   String
+  request     Request  @relation(fields: [requestId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime @default(now())
+}
+
+// Notification — in-app notifications sent to users
+// Example: "Your request #42 status was updated to Resolved"
+model Notification {
+  id        String   @id @default(uuid())
+  message   String
+  type      String   // e.g. "STATUS_UPDATE", "NEW_COMMENT"
+  isRead    Boolean  @default(false) // turns false to true when user opens it
+
+  // Who receives this notification
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+
+  // Which request triggered it (optional)
+  requestId String?
+  request   Request? @relation(fields: [requestId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+}
+
+// SatisfactionRating — students rate a request after it is resolved (1 to 5 stars)
+model SatisfactionRating {
+  id        String   @id @default(uuid())
+  rating    Int      // 1 = worst, 5 = best
+
+  // Which student submitted the rating
+  studentId String
+  student   User     @relation(fields: [studentId], references: [id])
+
+  // Which request is being rated — one request can only have one rating
+  requestId String   @unique
+  request   Request  @relation(fields: [requestId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+}
