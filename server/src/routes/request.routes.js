@@ -7,6 +7,7 @@ const requestController = require('../controllers/request.controller');
 const { authenticate } = require('../middleware/authenticate');
 const { authorize } = require('../middleware/authorize');
 const { upload } = require('../middleware/upload');
+const commentController = require('../controllers/comment.controller');
 
 const router = Router();
 
@@ -239,5 +240,103 @@ router.get('/:id', authenticate, requestController.getRequestById);
  *         description: Request not found
  */
 router.patch('/:id', authenticate, authorize('SUPPORT'), requestController.updateRequest);
+
+/**
+ * @swagger
+ * /requests/{id}/comments:
+ *   post:
+ *     summary: Add a comment to a request (Student or Support)
+ *     tags: [Requests]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Request ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [content]
+ *             properties:
+ *               content:
+ *                 type: string
+ *                 example: I have checked my portal again but it still fails.
+ *               isInternal:
+ *                 type: boolean
+ *                 description: Only allowed for support reps. If true, students cannot see it.
+ *                 example: false
+ *     responses:
+ *       201:
+ *         description: Comment added successfully
+ *       400:
+ *         description: Missing fields or invalid request
+ *       401:
+ *         description: Not authenticated
+ *       403:
+ *         description: Access denied (student trying to comment on someone else's request)
+ *       404:
+ *         description: Request not found
+ */
+router.post('/:id/comments', authenticate, commentController.createComment);
+
+/**
+ * @swagger
+ * /requests/{id}/comments:
+ *   get:
+ *     summary: Get all comments for a request (Student gets public notes, Support gets all)
+ *     tags: [Requests]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Request ID
+ *     responses:
+ *       200:
+ *         description: List of comments
+ *       401:
+ *         description: Not authenticated
+ *       403:
+ *         description: Access denied
+ *       404:
+ *         description: Request not found
+ */
+router.get('/:id/comments', authenticate, commentController.getComments);
+
+/**
+ * @swagger
+ * /requests/{id}/activity:
+ *   get:
+ *     summary: Get the activity timeline log for a request (student filters out internal items)
+ *     tags: [Requests]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Request ID
+ *     responses:
+ *       200:
+ *         description: History log entries
+ *       401:
+ *         description: Not authenticated
+ *       403:
+ *         description: Access denied
+ *       404:
+ *         description: Request not found
+ */
+router.get('/:id/activity', authenticate, commentController.getActivityTimeline);
 
 module.exports = router;
