@@ -528,6 +528,38 @@ npm test
 
 ---
 
+### Stage 9 — Frontend Foundation
+
+**What was built:**
+The foundational skeleton for the React frontend, structured to support light/dark modes, secure client routing, responsive navigation layouts, Axios API integration, and real-time Socket.io state.
+
+**Key features and how they work:**
+- **Vite React SPA & TailwindCSS CSS variables:** Initialized Vite-based React project styled with vanilla CSS variables mapped dynamically to Tailwind tokens, enabling class-based dynamic dark mode toggling.
+- **State contexts:** Programmed `AuthContext` (JWT session restoration, API registration/login actions) and `SocketContext` (auto websocket instantiation on active login).
+- **Session expiration interceptors:** The Axios API client intercepts standard `401 Unauthorized` responses to clear invalid/expired storage keys and redirect students back to the login view with an `expired=true` URL warning parameter.
+
+---
+
+### Stage 10 — Auth UI (Login, Register & Verify Email)
+
+**What was built:**
+Production-ready authentication views styled with glassmorphism overlays, form validation, loader spinners, and dynamic alert banners. Includes local terminal fallback logging for verification codes.
+
+**Key features and how they work:**
+- **Comprehensive Page Views:**
+  - **Login:** Inputs with strict validation, loading states, and notification panels that dynamically process `?verified=true` or `?expired=true` query parameters.
+  - **Register:** Interactive custom cards for role selections (`STUDENT` or `SUPPORT`), email/password validation, and automatic redirect to the verification page passing the email parameter.
+  - **Verify Email:** A 6-box mono-spaced verification input block equipped with an automatic countdown and a "Resend Code" loading hook.
+- **Fail-safe Terminal Fallback:** When email service environment variables are not configured in dev, the server email client prints registration verification codes in a clean CLI card box inside node server console logs.
+
+**Files added/modified in this stage:**
+- [Login.jsx](file:///Users/anansafady/CS%20/VS%20code%20projects/RequestFlow%20/RequestFlow-/client/src/pages/Login.jsx) [MODIFY] — Handled forms, banners, and redirects.
+- [Register.jsx](file:///Users/anansafady/CS%20/VS%20code%20projects/RequestFlow%20/RequestFlow-/client/src/pages/Register.jsx) [MODIFY] — Setup role selectors, input validation.
+- [VerifyEmail.jsx](file:///Users/anansafady/CS%20/VS%20code%20projects/RequestFlow%20/RequestFlow-/client/src/pages/VerifyEmail.jsx) [MODIFY] — Verification code field and resend actions.
+- [sendEmail.js](file:///Users/anansafady/CS%20/VS%20code%20projects/RequestFlow%20/RequestFlow-/server/src/utils/sendEmail.js) [MODIFY] — Local terminal fallback card generator.
+
+---
+
 ## License
 
 MIT — built as a professional interview assignment.
