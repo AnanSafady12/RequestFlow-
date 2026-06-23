@@ -213,6 +213,79 @@ Each feature is built on its own branch and merged to `main` when complete:
 
 ---
 
+## Development Log
+
+This section explains what was built in each stage, how it works, and why we made certain decisions.
+
+---
+
+### Stage 0 — Base Project Setup
+
+**What was built:**
+The foundation of the monorepo — folder structure, environment configuration, Docker setup, and the initial README.
+
+**How it works:**
+- The project is split into two folders: `client/` (React frontend) and `server/` (Node.js backend)
+- `docker-compose.yml` defines a PostgreSQL database service. Running `docker compose up -d` starts the database in the background with no manual installation needed
+- `.env.example` files act as templates — developers copy them to `.env` and fill in real values. The `.env` files are never committed to GitHub (blocked by `.gitignore`)
+- `.aiexclude` tells AI coding assistants to never read `.env` files or other sensitive files
+
+**Key decision:** Using Docker for the database means any developer (or interviewer) can get the database running with a single command, regardless of their machine setup.
+
+---
+
+### Stage 1 — Backend Foundation
+
+**What was built:**
+The complete backend skeleton — Express server, database schema, seed script, and all middleware.
+
+**How the Express server works:**
+Every request that comes in passes through a chain of middleware before reaching the route handler:
+
+```
+Request comes in
+    ↓
+helmet        → adds security headers automatically
+    ↓
+cors          → allows the React frontend (port 5173) to talk to this backend (port 3000)
+    ↓
+express.json  → reads the request body and parses it as JSON
+    ↓
+morgan        → logs the request to the terminal (method, URL, status, time)
+    ↓
+rate limiter  → blocks an IP if it sends more than 100 requests in 15 minutes
+    ↓
+Route Handler → the actual function that handles the request
+    ↓
+Error Handler → catches any error and returns a clean JSON response
+```
+
+**How the database schema works:**
+Prisma reads `prisma/schema.prisma` and uses it to create real PostgreSQL tables. The schema defines 7 tables:
+
+| Table | Purpose |
+|---|---|
+| `User` | Both students and support reps (separated by `role` field) |
+| `Request` | The support request with status, priority, and category |
+| `Comment` | Messages on a request — can be internal (support-only) |
+| `Attachment` | Files attached to a request |
+| `Activity` | Auto-generated log of every action (builds the timeline) |
+| `Notification` | In-app notifications per user |
+| `SatisfactionRating` | Student rates a resolved request 1–5 stars |
+
+**How the seed script works:**
+Running `npm run seed` clears all old data and creates fresh test data:
+- 2 student users + 2 support users (all with password `password123`)
+- 5 requests across different categories and statuses
+- Comments, activity logs, and a satisfaction rating
+
+**Key decision:** We used **Prisma 5** instead of the latest version (v7). Prisma 7 made breaking changes to how the database URL is configured. Prisma 5 is stable, widely used in production, and works the classic way.
+
+**Important note — Docker port:**
+A local PostgreSQL was already installed on this machine and running on port `5432`. Docker's container was changed to use port `5433` to avoid conflict. The `DATABASE_URL` in `server/.env` uses `localhost:5433`.
+
+---
+
 ## License
 
 MIT — built as a professional interview assignment.
