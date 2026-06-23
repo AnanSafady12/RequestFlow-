@@ -286,6 +286,82 @@ A local PostgreSQL was already installed on this machine and running on port `54
 
 ---
 
+### Stage 2 — Authentication System
+
+**What was built:**
+Complete authentication — register, email verification with 6-digit code, login, and JWT-protected routes.
+
+**How registration works:**
+```
+User fills register form
+    ↓
+Backend creates account (password hashed with bcrypt, isVerified = false)
+    ↓
+6-digit code generated → stored in DB with 10-minute expiry
+    ↓
+Code sent to user's Gmail via Nodemailer
+    ↓
+User types code in the app → backend checks it → account activated
+```
+
+**How login works:**
+```
+User submits email + password
+    ↓
+Backend finds user by email
+    ↓
+bcrypt.compare() checks if the password matches the hashed version in DB
+    ↓
+If account is not verified → 403 error (must verify email first)
+    ↓
+If credentials are correct → JWT token is created and returned
+    ↓
+Frontend stores the token and sends it with every future request
+```
+
+**How JWT token protection works:**
+```
+Request arrives at a protected route (e.g. GET /api/auth/me)
+    ↓
+authenticate.js middleware reads the Authorization header
+    ↓
+jwt.verify() checks the token is real and not expired
+    ↓
+User info (id, role, name) is attached to req.user
+    ↓
+Route handler runs and can use req.user freely
+```
+
+**How role authorization works:**
+```
+POST /api/requests/:id  →  authenticate  →  authorize('SUPPORT')  →  handler
+                                ↑                    ↑
+                        is logged in?        is user a SUPPORT rep?
+                        (checks JWT)         (checks req.user.role)
+```
+
+**Files added in this stage:**
+| File | Purpose |
+|---|---|
+| `src/utils/generateCode.js` | Generates a random 6-digit number |
+| `src/utils/sendEmail.js` | Sends HTML emails via Gmail using Nodemailer |
+| `src/middleware/authenticate.js` | Verifies JWT token on every protected route |
+| `src/middleware/authorize.js` | Checks if user has the required role |
+| `src/services/auth.service.js` | Business logic for register, verify, login |
+| `src/controllers/auth.controller.js` | HTTP layer — reads request, calls service, sends response |
+| `src/routes/auth.routes.js` | Defines the URL paths and connects them to controllers |
+
+**API endpoints added:**
+| Method | URL | Description |
+|---|---|---|
+| POST | `/api/auth/register` | Create account, sends 6-digit code to email |
+| POST | `/api/auth/verify-code` | Activate account using the 6-digit code |
+| POST | `/api/auth/resend-code` | Request a new code if the old one expired |
+| POST | `/api/auth/login` | Login and receive JWT token |
+| GET | `/api/auth/me` | Get current user info (protected) |
+
+---
+
 ## License
 
 MIT — built as a professional interview assignment.
