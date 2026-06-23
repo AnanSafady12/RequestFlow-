@@ -28,6 +28,9 @@ async function createRequest(req, res, next) {
 
     res.status(201).json(request);
   } catch (error) {
+    if (error.message.includes('Invalid category') || error.message.includes('Invalid priority')) {
+      return res.status(400).json({ error: error.message });
+    }
     next(error);
   }
 }
