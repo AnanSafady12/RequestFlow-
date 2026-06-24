@@ -600,6 +600,22 @@ The complete support-facing workspace including the dashboard analytics, a globa
 
 ---
 
+### Stage 13 — Search & Filtering
+
+**What was built:**
+Refactored the filtering functionality to sync search and filter states with URL query parameters using React Router.
+
+**Key features and how they work:**
+- **URL-Synced State:** Search term, category, status, and priority filters are all connected to the browser's URL via `useSearchParams`. 
+- **Persisted State on Reload:** If you copy and share a filtered URL or refresh the page, the filters seamlessly remount with their expected values, ensuring context isn't lost.
+- **Helper Integration:** Constructed local helper functions to set query parameters without obliterating other active filters or pushing unnecessary history blocks.
+
+**Files added/modified in this stage:**
+- [StudentRequests.jsx](file:///Users/anansafady/CS%20/VS%20code%20projects/RequestFlow%20/RequestFlow-/client/src/pages/StudentRequests.jsx) [MODIFY] — Swapped `useState` hooks for `useSearchParams`.
+- [SupportRequests.jsx](file:///Users/anansafady/CS%20/VS%20code%20projects/RequestFlow%20/RequestFlow-/client/src/pages/SupportRequests.jsx) [MODIFY] — Swapped `useState` hooks for `useSearchParams`.
+
+---
+
 ## License
 
 MIT — built as a professional interview assignment.

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import api from '../services/api';
 import { 
   Search, 
@@ -15,11 +15,25 @@ export default function SupportRequests() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // Filtering states
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState('');
-  const [priorityFilter, setPriorityFilter] = useState('');
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // Read current filters from URL
+  const searchTerm = searchParams.get('search') || '';
+  const statusFilter = searchParams.get('status') || '';
+  const categoryFilter = searchParams.get('category') || '';
+  const priorityFilter = searchParams.get('priority') || '';
+
+  // Helper to update a specific parameter without overwriting others
+  const updateFilter = (key, value) => {
+    setSearchParams((prev) => {
+      if (value) {
+        prev.set(key, value);
+      } else {
+        prev.delete(key);
+      }
+      return prev;
+    });
+  };
 
   useEffect(() => {
     async function fetchRequests() {
@@ -51,10 +65,7 @@ export default function SupportRequests() {
 
   // Reset all filters
   const resetFilters = () => {
-    setSearchTerm('');
-    setStatusFilter('');
-    setCategoryFilter('');
-    setPriorityFilter('');
+    setSearchParams(new URLSearchParams());
   };
 
   // Dynamic priority styles for badges
@@ -118,7 +129,7 @@ export default function SupportRequests() {
               type="text"
               placeholder="Search requests..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => updateFilter('search', e.target.value)}
               className="w-full pl-9 pr-4 py-2 bg-secondary/35 border border-border/80 rounded-2xl text-xs outline-none focus:border-primary transition-all duration-200"
             />
           </div>
@@ -127,7 +138,7 @@ export default function SupportRequests() {
           <div className="relative">
             <select
               value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
+              onChange={(e) => updateFilter('status', e.target.value)}
               className="w-full px-3 py-2 bg-secondary/35 border border-border/80 rounded-2xl text-xs outline-none focus:border-primary appearance-none cursor-pointer text-foreground"
             >
               <option value="">All Statuses</option>
@@ -142,7 +153,7 @@ export default function SupportRequests() {
           <div className="relative">
             <select
               value={categoryFilter}
-              onChange={(e) => setCategoryFilter(e.target.value)}
+              onChange={(e) => updateFilter('category', e.target.value)}
               className="w-full px-3 py-2 bg-secondary/35 border border-border/80 rounded-2xl text-xs outline-none focus:border-primary appearance-none cursor-pointer text-foreground"
             >
               <option value="">All Categories</option>
@@ -158,7 +169,7 @@ export default function SupportRequests() {
           <div className="relative">
             <select
               value={priorityFilter}
-              onChange={(e) => setPriorityFilter(e.target.value)}
+              onChange={(e) => updateFilter('priority', e.target.value)}
               className="w-full px-3 py-2 bg-secondary/35 border border-border/80 rounded-2xl text-xs outline-none focus:border-primary appearance-none cursor-pointer text-foreground"
             >
               <option value="">All Priorities</option>
