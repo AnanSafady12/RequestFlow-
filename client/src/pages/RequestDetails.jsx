@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { useSocket } from '../context/SocketContext';
 import { 
   ArrowLeft, 
   Clock, 
@@ -24,6 +25,7 @@ import {
 export default function RequestDetails() {
   const { id } = useParams();
   const { user } = useAuth();
+  const socket = useSocket();
 
   const [request, setRequest] = useState(null);
   const [comments, setComments] = useState([]);
@@ -62,6 +64,27 @@ export default function RequestDetails() {
   useEffect(() => {
     fetchData();
   }, [id]);
+
+  // Real-time listener for current request
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleLiveUpdate = (data) => {
+      // Refresh if the updated entity matches the one we are viewing
+      if (data.requestId === parseInt(id) || data.id === parseInt(id)) {
+        // Debounce or just call fetchData to get fresh activities/comments
+        fetchData();
+      }
+    };
+
+    socket.on('request:updated', handleLiveUpdate);
+    socket.on('comment:new', handleLiveUpdate);
+
+    return () => {
+      socket.off('request:updated', handleLiveUpdate);
+      socket.off('comment:new', handleLiveUpdate);
+    };
+  }, [socket, id]);
 
   // Combine comments and activities chronologically
   const getTimeline = () => {

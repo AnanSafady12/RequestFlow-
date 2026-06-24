@@ -10,8 +10,10 @@ import {
   Inbox,
   Star,
   Users,
-  AlertCircle
+  AlertCircle,
+  Wifi
 } from 'lucide-react';
+import { useSocket } from '../context/SocketContext';
 
 export default function SupportDashboard() {
   const { user } = useAuth();
@@ -20,6 +22,25 @@ export default function SupportDashboard() {
   const [agentSatisfaction, setAgentSatisfaction] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  
+  // Real-time state
+  const socket = useSocket();
+  const [onlineUsers, setOnlineUsers] = useState([]);
+
+  // Socket listener for online users
+  useEffect(() => {
+    if (!socket) return;
+
+    socket.on('users:online', (payload) => {
+      // payload is { support: [], students: [], totalOnline: N }
+      const combined = [...(payload.support || []), ...(payload.students || [])];
+      setOnlineUsers(combined);
+    });
+
+    return () => {
+      socket.off('users:online');
+    };
+  }, [socket]);
 
   useEffect(() => {
     async function fetchDashboardData() {
@@ -153,9 +174,38 @@ export default function SupportDashboard() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Real-time Online Users */}
+        <div className="bg-card border border-border shadow-sm rounded-2xl overflow-hidden flex flex-col lg:col-span-1">
+          <div className="p-6 border-b border-border bg-emerald-50/30">
+            <h2 className="text-lg font-semibold flex items-center text-emerald-700">
+              <Wifi className="w-5 h-5 mr-2 animate-pulse" />
+              Live Online Users ({onlineUsers.length})
+            </h2>
+          </div>
+          <div className="p-0 flex-1 overflow-auto max-h-96">
+            {onlineUsers.length === 0 ? (
+              <div className="p-6 text-center text-muted-foreground">
+                Connecting to live tracker...
+              </div>
+            ) : (
+              <div className="divide-y divide-border">
+                {onlineUsers.map((u) => (
+                  <div key={u.id} className="p-4 flex items-center space-x-3">
+                    <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]"></div>
+                    <div>
+                      <p className="text-sm font-semibold">{u.name}</p>
+                      <p className="text-[10px] text-muted-foreground uppercase">{u.role}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
         {/* SLA Breaches List */}
-        <div className="bg-card border border-border shadow-sm rounded-2xl overflow-hidden flex flex-col">
+        <div className="bg-card border border-border shadow-sm rounded-2xl overflow-hidden flex flex-col lg:col-span-1">
           <div className="p-6 border-b border-border bg-red-50/30">
             <h2 className="text-lg font-semibold flex items-center text-red-700">
               <AlertTriangle className="w-5 h-5 mr-2" />
@@ -193,7 +243,7 @@ export default function SupportDashboard() {
         </div>
 
         {/* Agent Satisfaction Table */}
-        <div className="bg-card border border-border shadow-sm rounded-2xl overflow-hidden flex flex-col">
+        <div className="bg-card border border-border shadow-sm rounded-2xl overflow-hidden flex flex-col lg:col-span-1">
           <div className="p-6 border-b border-border bg-orange-50/30">
             <h2 className="text-lg font-semibold flex items-center text-orange-700">
               <Users className="w-5 h-5 mr-2" />
