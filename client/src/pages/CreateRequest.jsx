@@ -8,7 +8,8 @@ import {
   AlertTriangle, 
   ArrowLeft, 
   Send,
-  Sparkles
+  Sparkles,
+  X
 } from 'lucide-react';
 
 export default function CreateRequest() {

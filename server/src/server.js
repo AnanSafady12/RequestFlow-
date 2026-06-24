@@ -66,7 +66,7 @@ if (process.env.NODE_ENV !== 'production') {
 // This prevents spam and brute-force attacks on login
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes window
-  max: 100,                  // max 100 requests per 15 minutes per IP
+  max: 5000,                 // Increased for development to prevent lockouts
   message: {
     error: 'Too many requests from this IP, please try again after 15 minutes.',
   },

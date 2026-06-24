@@ -14,6 +14,7 @@ import CreateRequest from './pages/CreateRequest';
 import RequestDetails from './pages/RequestDetails';
 import SupportDashboard from './pages/SupportDashboard';
 import SupportRequests from './pages/SupportRequests';
+import SupportRequestDetails from './pages/SupportRequestDetails';
 import Unauthorized from './pages/Unauthorized';
 
 export default function App() {
@@ -48,6 +49,7 @@ export default function App() {
         <Route element={<LayoutWrapper />}>
           <Route path="/support" element={<SupportDashboard />} />
           <Route path="/support/requests" element={<SupportRequests />} />
+          <Route path="/support/requests/:id" element={<SupportRequestDetails />} />
         </Route>
       </Route>
 
