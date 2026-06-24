@@ -616,6 +616,27 @@ Refactored the filtering functionality to sync search and filter states with URL
 
 ---
 
+### Stage 14 — Real-time Frontend (Socket.io)
+
+**What was built:**
+Connected the React frontend to the Node.js Socket.io server to enable real-time notifications, a live online users tracker, and instant UI updates without page reloads.
+
+**Key features and how they work:**
+- **Context-driven WebSockets:** Initialized the Socket.io client inside a `SocketContext` that automatically connects and authenticates using the JWT token from `localStorage` whenever a user signs in.
+- **Global Toast System:** Engineered a custom `ToastContext` using Lucide icons to fire animated pop-up alerts whenever a `notification:new` socket event fires.
+- **Notification Dropdown:** Added a dropdown to the navbar bell icon. It polls the database on load for historical notifications, prepends live socket notifications, and marks notifications as read via API calls.
+- **Live User Tracker:** The Support Dashboard listens to the `users:online` broadcast to render a pulsing, dynamic list of currently connected staff and students.
+- **Instant Detail Refresh:** When viewing a ticket in either `RequestDetails.jsx` or `SupportRequestDetails.jsx`, the components listen for `comment:new` and `request:updated` events. If the incoming event's `requestId` matches the open ticket, the UI seamlessly fetches the fresh data and appends it to the timeline, guaranteeing users never miss a message.
+
+**Files added/modified in this stage:**
+- [SocketContext.jsx](file:///Users/anansafady/CS%20/VS%20code%20projects/RequestFlow%20/RequestFlow-/client/src/context/SocketContext.jsx) [NEW] — Wrapped socket initialization logic.
+- [ToastContext.jsx](file:///Users/anansafady/CS%20/VS%20code%20projects/RequestFlow%20/RequestFlow-/client/src/context/ToastContext.jsx) [NEW] — Lightweight global toast notification provider.
+- [Navbar.jsx](file:///Users/anansafady/CS%20/VS%20code%20projects/RequestFlow%20/RequestFlow-/client/src/components/layout/Navbar.jsx) [MODIFY] — Handled socket notifications and built the read/unread dropdown.
+- [SupportDashboard.jsx](file:///Users/anansafady/CS%20/VS%20code%20projects/RequestFlow%20/RequestFlow-/client/src/pages/SupportDashboard.jsx) [MODIFY] — Added the live online users widget.
+- [RequestDetails.jsx](file:///Users/anansafady/CS%20/VS%20code%20projects/RequestFlow%20/RequestFlow-/client/src/pages/RequestDetails.jsx) & [SupportRequestDetails.jsx](file:///Users/anansafady/CS%20/VS%20code%20projects/RequestFlow%20/RequestFlow-/client/src/pages/SupportRequestDetails.jsx) [MODIFY] — Added socket listeners to refetch the timeline upon real-time updates.
+
+---
+
 ## License
 
 MIT — built as a professional interview assignment.
