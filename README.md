@@ -637,6 +637,22 @@ Connected the React frontend to the Node.js Socket.io server to enable real-time
 
 ---
 
+### Stage 15 — File Attachments
+
+**What was built:**
+Upgraded the basic file attachment inputs into a modern, interactive drag-and-drop zone, and introduced dynamic image thumbnail previews within the ticket timeline workspaces.
+
+**Key features and how they work:**
+- **Drag-and-Drop Zone:** Replaced the standard `<input type="file" />` in `CreateRequest.jsx` with a custom area that responds to `onDragOver`, `onDragLeave`, and `onDrop` events. It applies scaling and glowing border CSS effects while a file is hovered over the area.
+- **Client-Side Validation:** Immediately validates file size (max 5MB) and mime type (JPG, PNG, PDF) during the drop event before touching the backend APIs.
+- **Dynamic Previews:** Instead of rendering a generic file link for every attachment, the ticket details pages check if the file's `mimetype` starts with `image/`. If true, it renders a full image thumbnail using `http://localhost:3000/uploads/...` with a neat hover overlay. If it's a PDF, it falls back to a clean document card.
+
+**Files added/modified in this stage:**
+- [CreateRequest.jsx](file:///Users/anansafady/CS%20/VS%20code%20projects/RequestFlow%20/RequestFlow-/client/src/pages/CreateRequest.jsx) [MODIFY] — Implemented the drag-and-drop zone and selected file preview card.
+- [RequestDetails.jsx](file:///Users/anansafady/CS%20/VS%20code%20projects/RequestFlow%20/RequestFlow-/client/src/pages/RequestDetails.jsx) & [SupportRequestDetails.jsx](file:///Users/anansafady/CS%20/VS%20code%20projects/RequestFlow%20/RequestFlow-/client/src/pages/SupportRequestDetails.jsx) [MODIFY] — Implemented image thumbnail previews for attachments.
+
+---
+
 ## License
 
 MIT — built as a professional interview assignment.
