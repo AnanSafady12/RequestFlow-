@@ -1,33 +1,55 @@
-# docker-compose.yml
-# This file lets you start the PostgreSQL database with a single command.
-# Run: docker compose up -d
-# The -d flag means "run in the background" so it doesn't block your terminal.
-
 version: '3.9'
 
 services:
-  # This is the PostgreSQL database service
-  postgres:
-    image: postgres:16-alpine       # Use PostgreSQL version 16 (alpine = small image)
-    container_name: requestflow_db  # Give the container a friendly name
-    restart: unless-stopped         # Restart automatically if it crashes
-
+  # Database Service
+  db:
+    image: postgres:16-alpine
+    container_name: requestflow_db
+    restart: unless-stopped
     environment:
-      # These are the database credentials — they come from the .env file
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: ${DB_NAME}
-
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      POSTGRES_DB: ${DB_NAME:-requestflow_db}
     ports:
-      # Map port 5433 on your computer to port 5432 inside the container.
-      # We use 5433 because a local PostgreSQL is already running on 5432.
-      # Prisma connects to localhost:5433 which routes into the Docker container.
       - '5433:5432'
-
     volumes:
-      # Save the database data to a named volume so it persists even if the container restarts
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-requestflow_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
-# Named volume — Docker manages where this is stored on your machine
+  # Backend Node.js Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: requestflow_server
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - '3000:3000'
+    env_file:
+      - .env
+      - ./server/.env
+    environment:
+      # Override DATABASE_URL to use the internal Docker network name 'db' instead of localhost
+      DATABASE_URL: "postgresql://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@db:5432/${DB_NAME:-requestflow_db}?schema=public"
+
+  # Frontend React App (Nginx)
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: requestflow_client
+    restart: unless-stopped
+    depends_on:
+      - server
+    ports:
+      - '5173:80'
+
 volumes:
   postgres_data:
