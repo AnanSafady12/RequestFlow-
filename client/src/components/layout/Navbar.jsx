@@ -49,7 +49,11 @@ export default function Navbar() {
 
         {/* Notification Bell */}
         {user && (
-          <button className="p-2 rounded-lg hover:bg-secondary text-muted-foreground hover:text-foreground relative transition-all duration-200">
+          <button 
+            onClick={() => alert("Notifications center will be implemented soon!")}
+            className="p-2 rounded-lg hover:bg-secondary text-muted-foreground hover:text-foreground relative transition-all duration-200"
+            title="Notifications"
+          >
             <Bell size={20} />
             <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-destructive rounded-full status-indicator-pulse"></span>
           </button>

@@ -581,6 +581,25 @@ The complete student-facing workspace including the main landing dashboard with 
 
 ---
 
+### Stage 12 — Support UI
+
+**What was built:**
+The complete support-facing workspace including the dashboard analytics, a global ticket management list, and the ticket resolution workspace with internal agent notes.
+
+**Key features and how they work:**
+- **Dynamic Dashboard Analytics:** Fetches and renders real-time stats including total requests, open tickets, SLAs breached, average response time, top category, and an agent satisfaction matrix.
+- **Global Ticket Search & Filters:** Similar to the student view, but exposes all tickets across the system to support reps. Includes text search, category, status, and priority dropdowns.
+- **Support Ticket Workspace:** Allows agents to update the ticket's priority, status, and assignment. Displays SLA breach badges if overdue.
+- **Internal Notes:** Agents can toggle an "Internal Note" checkbox when posting a comment. These notes render with a distinct amber styling and a lock icon, completely hidden from the student's timeline view but visible to other support reps.
+
+**Files added/modified in this stage:**
+- `App.jsx` [MODIFY] — Registered support routing layouts.
+- `SupportDashboard.jsx` [NEW] — Dashboard metrics aggregator and SLA breach warnings.
+- `SupportRequests.jsx` [NEW] — Global tickets index with filtering.
+- `SupportRequestDetails.jsx` [NEW] — Unified ticket details workspace featuring the timeline, form controls for status/priority updates, assignee management, and internal notes functionality.
+
+---
+
 ## License
 
 MIT — built as a professional interview assignment.
