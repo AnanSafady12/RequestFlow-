@@ -79,27 +79,23 @@ cp server/.env.example server/.env
 cp client/.env.example client/.env
 ```
 
-### 3. Start the database
+### 3. Start the entire application
 ```bash
-# This starts PostgreSQL in Docker (runs in the background)
-docker compose up -d
+# This downloads and builds the database, backend server, and frontend website
+# and runs them all in the background
+docker compose up -d --build
 ```
 
-### 4. Install and run the backend
+### 4. Setup the Database (One-time only)
 ```bash
-cd server
-npm install
-npx prisma migrate dev    # creates all database tables
-npm run seed              # creates test users and sample data
-npm run dev               # starts the backend on http://localhost:3000
+# Run migrations and seed data into the Docker container
+docker compose exec server npx prisma migrate deploy
+docker compose exec server npm run seed
 ```
 
-### 5. Install and run the frontend
-```bash
-cd client
-npm install
-npm run dev               # starts the frontend on http://localhost:5173
-```
+### 5. Open the app
+- **Frontend Website:** `http://localhost:5173`
+- **Backend API Docs:** `http://localhost:3000/api/docs`
 
 ---
 
@@ -650,6 +646,18 @@ Upgraded the basic file attachment inputs into a modern, interactive drag-and-dr
 **Files added/modified in this stage:**
 - [CreateRequest.jsx](file:///Users/anansafady/CS%20/VS%20code%20projects/RequestFlow%20/RequestFlow-/client/src/pages/CreateRequest.jsx) [MODIFY] — Implemented the drag-and-drop zone and selected file preview card.
 - [RequestDetails.jsx](file:///Users/anansafady/CS%20/VS%20code%20projects/RequestFlow%20/RequestFlow-/client/src/pages/RequestDetails.jsx) & [SupportRequestDetails.jsx](file:///Users/anansafady/CS%20/VS%20code%20projects/RequestFlow%20/RequestFlow-/client/src/pages/SupportRequestDetails.jsx) [MODIFY] — Implemented image thumbnail previews for attachments.
+
+---
+
+### Stage 16 — Polish and Final
+
+**What was built:**
+The final sprint of the project. Focused strictly on documentation, test-environment portability, and ensuring evaluators can seamlessly review the code.
+
+**Key features and how they work:**
+- **Full Stack Containerization:** Completely rewrote `docker-compose.yml` and added Dockerfiles to containerize the **entire** application. Reviewers can now spin up the Database, Node.js Backend, and an Nginx-served React Frontend with a single `docker compose up` command.
+- **Postman Collection Export:** Generated a `RequestFlow.postman_collection.json` file in the root directory. Reviewers can import this into Postman to instantly test Authentication, Request CRUD, and Dashboard analytics APIs without manually constructing payloads.
+- **Database Seed Failsafe:** Retained the `seed.js` script to instantly generate realistic students, support reps, mock requests, SLA breaches, and satisfaction ratings right out of the box.
 
 ---
 
