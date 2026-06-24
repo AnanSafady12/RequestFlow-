@@ -265,24 +265,52 @@ export default function SupportRequestDetails() {
                   Attachments ({request.attachments.length})
                 </span>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {request.attachments.map((file) => (
-                    <a 
-                      key={file.id}
-                      href={`http://localhost:3000/uploads/${file.filename}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center justify-between p-3 bg-secondary/20 hover:bg-secondary/45 border border-border/60 rounded-2xl transition-all duration-200 group"
-                    >
-                      <div className="flex items-center space-x-3 text-xs overflow-hidden">
-                        <Paperclip size={16} className="text-muted-foreground group-hover:text-primary transition-colors flex-shrink-0" />
-                        <div className="overflow-hidden">
-                          <p className="font-semibold text-foreground truncate">{file.originalName}</p>
-                          <p className="text-[10px] text-muted-foreground mt-0.5">{(file.size / 1024).toFixed(0)} KB</p>
-                        </div>
-                      </div>
-                      <Download size={14} className="text-muted-foreground group-hover:text-primary transition-colors flex-shrink-0 ml-2" />
-                    </a>
-                  ))}
+                  {request.attachments.map((file) => {
+                    const isImage = file.mimetype && file.mimetype.startsWith('image/');
+                    const fileUrl = `http://localhost:3000/uploads/${file.filename}`;
+                    
+                    return (
+                      <a 
+                        key={file.id}
+                        href={fileUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={`flex ${isImage ? 'flex-col items-center p-2' : 'items-center justify-between p-3'} bg-secondary/20 hover:bg-secondary/45 border border-border/60 rounded-2xl transition-all duration-200 group overflow-hidden`}
+                      >
+                        {isImage ? (
+                          <>
+                            <div className="w-full h-32 bg-secondary/50 rounded-xl overflow-hidden mb-2 relative flex items-center justify-center group-hover:opacity-90 transition-opacity">
+                              <img 
+                                src={fileUrl} 
+                                alt={file.originalName} 
+                                className="w-full h-full object-cover"
+                              />
+                              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
+                                <Download size={24} className="text-white opacity-0 group-hover:opacity-100 transition-opacity drop-shadow-md" />
+                              </div>
+                            </div>
+                            <div className="w-full flex items-center justify-between px-1">
+                              <div className="overflow-hidden">
+                                <p className="font-semibold text-xs text-foreground truncate max-w-[140px]">{file.originalName}</p>
+                                <p className="text-[10px] text-muted-foreground mt-0.5">{(file.size / 1024).toFixed(0)} KB</p>
+                              </div>
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <div className="flex items-center space-x-3 text-xs overflow-hidden">
+                              <Paperclip size={16} className="text-muted-foreground group-hover:text-primary transition-colors flex-shrink-0" />
+                              <div className="overflow-hidden">
+                                <p className="font-semibold text-foreground truncate">{file.originalName}</p>
+                                <p className="text-[10px] text-muted-foreground mt-0.5">{(file.size / 1024).toFixed(0)} KB</p>
+                              </div>
+                            </div>
+                            <Download size={14} className="text-muted-foreground group-hover:text-primary transition-colors flex-shrink-0 ml-2" />
+                          </>
+                        )}
+                      </a>
+                    );
+                  })}
                 </div>
               </div>
             )}

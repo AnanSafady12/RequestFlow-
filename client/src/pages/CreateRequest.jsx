@@ -9,7 +9,8 @@ import {
   ArrowLeft, 
   Send,
   Sparkles,
-  X
+  X,
+  UploadCloud
 } from 'lucide-react';
 
 export default function CreateRequest() {
@@ -23,6 +24,7 @@ export default function CreateRequest() {
 
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
 
   const handleCategoryChange = (e) => {
     const cat = e.target.value;
@@ -40,7 +42,12 @@ export default function CreateRequest() {
 
   const handleFileChange = (e) => {
     setError('');
-    const selectedFile = e.target.files[0];
+    const selectedFile = e.target.files ? e.target.files[0] : null;
+    processFile(selectedFile);
+    if (e.target) e.target.value = null; // clear file input
+  };
+
+  const processFile = (selectedFile) => {
     if (!selectedFile) {
       setFile(null);
       return;
@@ -51,7 +58,6 @@ export default function CreateRequest() {
     if (selectedFile.size > maxSize) {
       setError('File size exceeds the 5MB limit.');
       setFile(null);
-      e.target.value = null; // clear file input
       return;
     }
 
@@ -60,11 +66,30 @@ export default function CreateRequest() {
     if (!allowedTypes.includes(selectedFile.type)) {
       setError('Unsupported file type. Only JPG, PNG, and PDF files are allowed.');
       setFile(null);
-      e.target.value = null; // clear file input
       return;
     }
 
     setFile(selectedFile);
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    if (!loading) setIsDragging(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+    if (loading) return;
+    
+    setError('');
+    const droppedFile = e.dataTransfer.files ? e.dataTransfer.files[0] : null;
+    processFile(droppedFile);
   };
 
   const handleSubmit = async (e) => {
@@ -217,40 +242,65 @@ export default function CreateRequest() {
             <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider block">
               Supporting Attachment
             </label>
-            <div className="flex items-center space-x-4">
-              <label 
-                className={`py-2 px-4 rounded-xl border border-dashed border-border hover:border-primary cursor-pointer flex items-center space-x-2 text-xs font-semibold text-muted-foreground hover:text-primary transition-all duration-200 bg-secondary/10 hover:bg-secondary/20 ${
-                  loading ? 'pointer-events-none opacity-50' : ''
-                }`}
+            
+            {!file ? (
+              <div 
+                className={`relative border-2 border-dashed rounded-2xl p-6 text-center transition-all duration-200 ${
+                  isDragging 
+                    ? 'border-primary bg-primary/5 shadow-[0_0_15px_rgba(var(--primary),0.1)] scale-[1.02]' 
+                    : 'border-border/80 hover:border-primary/50 bg-secondary/10 hover:bg-secondary/20'
+                } ${loading ? 'pointer-events-none opacity-50' : ''}`}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
               >
-                <Paperclip size={14} />
-                <span>Choose File</span>
                 <input 
                   type="file" 
+                  id="file-upload"
                   disabled={loading}
                   onChange={handleFileChange}
-                  className="hidden" 
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" 
                 />
-              </label>
-              
-              {file ? (
-                <div className="flex items-center space-x-2 bg-secondary/40 px-3 py-1.5 rounded-xl text-xs">
-                  <FileText size={14} className="text-primary" />
-                  <span className="font-medium max-w-[200px] truncate text-foreground">{file.name}</span>
-                  <span className="text-[10px] text-muted-foreground">({(file.size / 1024).toFixed(0)} KB)</span>
-                  <button 
-                    type="button" 
-                    disabled={loading}
-                    onClick={() => setFile(null)}
-                    className="text-muted-foreground hover:text-red-500 p-0.5 hover:bg-secondary/50 rounded"
-                  >
-                    <X size={12} />
-                  </button>
+                <div className="flex flex-col items-center space-y-2 pointer-events-none">
+                  <div className={`p-3 rounded-full ${isDragging ? 'bg-primary/20 text-primary' : 'bg-secondary/50 text-muted-foreground'}`}>
+                    <UploadCloud size={24} />
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-sm font-semibold text-foreground">
+                      <span className="text-primary hover:underline cursor-pointer">Click to upload</span> or drag and drop
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      PDF, PNG, or JPG (max. 5MB)
+                    </p>
+                  </div>
                 </div>
-              ) : (
-                <span className="text-xs text-muted-foreground">No file selected (Image or PDF, max 5MB)</span>
-              )}
-            </div>
+              </div>
+            ) : (
+              <div className="flex items-center justify-between p-4 bg-primary/5 border border-primary/20 rounded-2xl">
+                <div className="flex items-center space-x-4">
+                  <div className="p-2.5 bg-primary/10 text-primary rounded-xl">
+                    <FileText size={20} />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-foreground max-w-[200px] sm:max-w-[300px] truncate">
+                      {file.name}
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {(file.size / 1024).toFixed(1)} KB
+                    </p>
+                  </div>
+                </div>
+                <button 
+                  type="button" 
+                  disabled={loading}
+                  onClick={() => setFile(null)}
+                  className="p-2 text-muted-foreground hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-colors"
+                  title="Remove file"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Submit Action */}
