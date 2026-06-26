@@ -36,7 +36,7 @@ if (isEmailConfigured) {
 async function sendVerificationEmail(toEmail, code, userName) {
   if (isEmailConfigured && transporter) {
     const mailOptions = {
-      from: process.env.EMAIL_FROM || 'RequestFlow <noreply@gmail.com>',
+      from: `RequestFlow <${process.env.EMAIL_USER}>`,
       to: toEmail,
       subject: 'RequestFlow — Your Verification Code',
       html: `
@@ -98,7 +98,7 @@ async function sendStatusUpdateEmail(toEmail, userName, requestTitle, newStatus)
 
   if (isEmailConfigured && transporter) {
     const mailOptions = {
-      from: process.env.EMAIL_FROM || 'RequestFlow <noreply@gmail.com>',
+      from: `RequestFlow <${process.env.EMAIL_USER}>`,
       to: toEmail,
       subject: `RequestFlow — Your request status was updated`,
       html: `
