@@ -21,7 +21,6 @@ export default function SupportRequests() {
   const searchTerm = searchParams.get('search') || '';
   const statusFilter = searchParams.get('status') || '';
   const categoryFilter = searchParams.get('category') || '';
-  const priorityFilter = searchParams.get('priority') || '';
 
   // Helper to update a specific parameter without overwriting others
   const updateFilter = (key, value) => {
@@ -43,7 +42,6 @@ export default function SupportRequests() {
         const params = {};
         if (statusFilter) params.status = statusFilter;
         if (categoryFilter) params.category = categoryFilter;
-        if (priorityFilter) params.priority = priorityFilter;
         if (searchTerm) params.search = searchTerm;
 
         const response = await api.get('/requests', { params });
@@ -61,7 +59,7 @@ export default function SupportRequests() {
     }, 300);
 
     return () => clearTimeout(delayDebounce);
-  }, [searchTerm, statusFilter, categoryFilter, priorityFilter]);
+  }, [searchTerm, statusFilter, categoryFilter]);
 
   // Reset all filters
   const resetFilters = () => {
@@ -119,7 +117,7 @@ export default function SupportRequests() {
 
       {/* Filter and Search Bar */}
       <div className="glass-panel p-4 rounded-3xl bg-card/45 shadow-sm space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           {/* Search bar */}
           <div className="relative md:col-span-1">
             <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted-foreground">
@@ -164,24 +162,10 @@ export default function SupportRequests() {
               <option value="MEDICAL_APPROVAL">Medical Leave</option>
             </select>
           </div>
-
-          {/* Priority filter */}
-          <div className="relative">
-            <select
-              value={priorityFilter}
-              onChange={(e) => updateFilter('priority', e.target.value)}
-              className="w-full px-3 py-2 bg-secondary/35 border border-border/80 rounded-2xl text-xs outline-none focus:border-primary appearance-none cursor-pointer text-foreground"
-            >
-              <option value="">All Priorities</option>
-              <option value="LOW">Low</option>
-              <option value="MEDIUM">Medium</option>
-              <option value="HIGH">High</option>
-            </select>
-          </div>
         </div>
 
         {/* Clear filters label */}
-        {(searchTerm || statusFilter || categoryFilter || priorityFilter) && (
+        {(searchTerm || statusFilter || categoryFilter) && (
           <div className="flex items-center justify-between pt-1">
             <span className="text-xs text-muted-foreground">
               Showing {requests.length} matching result{requests.length === 1 ? '' : 's'}

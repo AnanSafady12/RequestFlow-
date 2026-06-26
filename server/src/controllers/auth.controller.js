@@ -120,4 +120,17 @@ async function getMe(req, res, next) {
   }
 }
 
-module.exports = { register, verifyCode, resendCode, login, getMe };
+// ─────────────────────────────────────────────
+// DELETE /api/auth/me
+// ─────────────────────────────────────────────
+
+async function deleteAccount(req, res, next) {
+  try {
+    const result = await authService.deleteAccount(req.user.id);
+    res.json(result);
+  } catch (error) {
+    next(error);
+  }
+}
+
+module.exports = { register, verifyCode, resendCode, login, getMe, deleteAccount };

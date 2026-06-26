@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { Sun, Moon, Bell, LogOut, User, Check, X } from 'lucide-react';
@@ -18,6 +18,20 @@ export default function Navbar() {
   const { addToast } = useToast();
   const [notifications, setNotifications] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
+  const dropdownRef = useRef(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowDropdown(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   // Fetch initial notifications
   useEffect(() => {
@@ -105,7 +119,7 @@ export default function Navbar() {
 
         {/* Notification Bell */}
         {user && (
-          <div className="relative">
+          <div className="relative" ref={dropdownRef}>
             <button 
               onClick={() => setShowDropdown(!showDropdown)}
               className="p-2 rounded-lg hover:bg-secondary text-muted-foreground hover:text-foreground relative transition-all duration-200"

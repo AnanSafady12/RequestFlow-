@@ -5,6 +5,13 @@
 
 const multer = require('multer');
 const path = require('path');
+const fs = require('fs');
+
+// Ensure the uploads directory exists before we try to save files to it
+const uploadDir = path.join(__dirname, '../../uploads');
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
 
 // --- Storage configuration ---
 // diskStorage tells multer to save files to disk (not memory)
@@ -12,7 +19,7 @@ const storage = multer.diskStorage({
   // destination: which folder to save uploaded files in
   destination: (req, file, cb) => {
     // cb stands for "callback" — we call it with (error, folder path)
-    cb(null, path.join(__dirname, '../../uploads'));
+    cb(null, uploadDir);
   },
 
   // filename: what to name the file on disk
