@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import {
   BarChart,
@@ -46,15 +46,9 @@ export default function SupportDashboard() {
     async function fetchDashboardData() {
       try {
         const [statsRes, slaRes, satRes] = await Promise.all([
-          axios.get('http://localhost:3000/api/dashboard/stats', {
-            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-          }),
-          axios.get('http://localhost:3000/api/dashboard/sla-breaches', {
-            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-          }),
-          axios.get('http://localhost:3000/api/dashboard/satisfaction', {
-            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-          })
+          api.get('/dashboard/stats'),
+          api.get('/dashboard/sla-breaches'),
+          api.get('/dashboard/satisfaction')
         ]);
         
         setStats(statsRes.data);
