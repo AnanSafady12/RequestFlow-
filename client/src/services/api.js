@@ -1,8 +1,13 @@
 import axios from 'axios';
 
+let baseApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+// Defensively clean up trailing slash and ensure /api is appended
+if (baseApiUrl.endsWith('/')) baseApiUrl = baseApiUrl.slice(0, -1);
+if (!baseApiUrl.endsWith('/api')) baseApiUrl += '/api';
+
 // Create a configured Axios instance
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000/api',
+  baseURL: baseApiUrl,
   headers: {
     'Content-Type': 'application/json',
   },

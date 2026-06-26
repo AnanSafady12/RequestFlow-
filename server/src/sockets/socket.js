@@ -19,7 +19,9 @@ const onlineUsers = new Map();
 function initSocket(httpServer) {
   io = new Server(httpServer, {
     cors: {
-      origin: process.env.CLIENT_URL || 'http://localhost:5173',
+      origin: function (origin, callback) {
+        callback(null, true);
+      },
       credentials: true,
     },
   });

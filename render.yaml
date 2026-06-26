@@ -18,8 +18,7 @@ services:
         value: "PASTE_NEON_URL_HERE"
       - key: JWT_SECRET
         generateValue: true
-      - key: CLIENT_URL
-        value: "*" # To prevent CORS errors initially
+
       - key: EMAIL_USER
         value: "PASTE_GMAIL_HERE"
       - key: EMAIL_PASS
