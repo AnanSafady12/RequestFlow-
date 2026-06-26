@@ -16,19 +16,19 @@ services:
       - key: PORT
         value: 3000
       - key: DATABASE_URL
-        sync: false # You will paste your Neon/Supabase URL here in the dashboard
+        value: "PASTE_NEON_URL_HERE"
       - key: JWT_SECRET
         generateValue: true
       - key: CLIENT_URL
         value: "*" # To prevent CORS errors initially
       - key: EMAIL_USER
-        sync: false # Requires manual entry in Render dashboard
+        value: "PASTE_GMAIL_HERE"
       - key: EMAIL_PASS
-        sync: false
+        value: "PASTE_APP_PASSWORD_HERE"
       - key: ADMIN_EMAIL
-        sync: false
+        value: "admin@tps.com"
       - key: ADMIN_PASSWORD
-        sync: false
+        value: "PASTE_ADMIN_PASSWORD_HERE"
 
   # ------------------------------------
   # 2. Frontend React Client
