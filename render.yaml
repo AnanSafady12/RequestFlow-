@@ -15,18 +15,18 @@ services:
         value: production
 
       - key: DATABASE_URL
-        value: "PASTE_NEON_URL_HERE"
+        sync: false
       - key: JWT_SECRET
         generateValue: true
 
       - key: EMAIL_USER
-        value: "PASTE_GMAIL_HERE"
+        sync: false
       - key: EMAIL_PASS
-        value: "PASTE_APP_PASSWORD_HERE"
+        sync: false
       - key: ADMIN_EMAIL
         value: "admin@tps.com"
       - key: ADMIN_PASSWORD
-        value: "PASTE_ADMIN_PASSWORD_HERE"
+        sync: false
 
   # ------------------------------------
   # 2. Frontend React Client
