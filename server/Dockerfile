@@ -20,5 +20,5 @@ RUN npx prisma generate
 # Expose port 3000
 EXPOSE 3000
 
-# Run migrations and start the server
-CMD sh -c "npx prisma migrate deploy && npm start"
+# Run migrations, seed admin, and start the server
+CMD sh -c "npx prisma migrate deploy && node prisma/seedAdmin.js && npm start"
