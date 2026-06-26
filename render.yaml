@@ -46,8 +46,7 @@ services:
         destination: /index.html
     envVars:
       - key: VITE_API_URL
-        sync: false # Requires manual entry in Render dashboard
+        value: "PASTE_SERVER_URL_HERE"
       - key: VITE_SOCKET_URL
-        sync: false 
-
+        value: "PASTE_SERVER_URL_HERE"
 
