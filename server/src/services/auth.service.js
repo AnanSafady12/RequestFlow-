@@ -230,4 +230,30 @@ async function getMe(userId) {
   return user;
 }
 
-module.exports = { register, verifyCode, resendCode, login, getMe };
+// ─────────────────────────────────────────────
+// DELETE ACCOUNT
+// ─────────────────────────────────────────────
+
+async function deleteAccount(userId) {
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user) {
+    const error = new Error('User not found');
+    error.status = 404;
+    throw error;
+  }
+  if (user.role === 'ADMIN') {
+    const error = new Error('Admin accounts cannot be deleted');
+    error.status = 403;
+    throw error;
+  }
+
+  // Delete the user from the database.
+  // Because we added onDelete: Cascade and onDelete: SetNull in Prisma,
+  // this will handle related data correctly without throwing a foreign key error.
+  await prisma.user.delete({
+    where: { id: userId },
+  });
+  return { message: 'Account deleted successfully' };
+}
+
+module.exports = { register, verifyCode, resendCode, login, getMe, deleteAccount };

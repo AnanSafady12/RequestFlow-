@@ -38,6 +38,8 @@ services:
     environment:
       # Override DATABASE_URL to use the internal Docker network name 'db' instead of localhost
       DATABASE_URL: "postgresql://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@db:5432/${DB_NAME:-requestflow_db}?schema=public"
+    volumes:
+      - server_uploads:/app/uploads
 
   # Frontend React App (Nginx)
   client:
@@ -53,3 +55,4 @@ services:
 
 volumes:
   postgres_data:
+  server_uploads:

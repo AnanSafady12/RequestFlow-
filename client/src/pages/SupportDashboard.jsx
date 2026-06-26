@@ -177,8 +177,8 @@ export default function SupportDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Real-time Online Users */}
         <div className="bg-card border border-border shadow-sm rounded-2xl overflow-hidden flex flex-col lg:col-span-1">
-          <div className="p-6 border-b border-border bg-emerald-50/30">
-            <h2 className="text-lg font-semibold flex items-center text-emerald-700">
+          <div className="p-6 border-b border-border bg-emerald-50/30 dark:bg-emerald-500/10">
+            <h2 className="text-lg font-semibold flex items-center text-emerald-700 dark:text-emerald-400">
               <Wifi className="w-5 h-5 mr-2 animate-pulse" />
               Live Online Users ({onlineUsers.length})
             </h2>
@@ -206,8 +206,8 @@ export default function SupportDashboard() {
 
         {/* SLA Breaches List */}
         <div className="bg-card border border-border shadow-sm rounded-2xl overflow-hidden flex flex-col lg:col-span-1">
-          <div className="p-6 border-b border-border bg-red-50/30">
-            <h2 className="text-lg font-semibold flex items-center text-red-700">
+          <div className="p-6 border-b border-border bg-red-50/30 dark:bg-red-500/10">
+            <h2 className="text-lg font-semibold flex items-center text-red-700 dark:text-red-400">
               <AlertTriangle className="w-5 h-5 mr-2" />
               SLA Breached Tickets
             </h2>
@@ -244,8 +244,8 @@ export default function SupportDashboard() {
 
         {/* Agent Satisfaction Table */}
         <div className="bg-card border border-border shadow-sm rounded-2xl overflow-hidden flex flex-col lg:col-span-1">
-          <div className="p-6 border-b border-border bg-orange-50/30">
-            <h2 className="text-lg font-semibold flex items-center text-orange-700">
+          <div className="p-6 border-b border-border bg-orange-50/30 dark:bg-orange-500/10">
+            <h2 className="text-lg font-semibold flex items-center text-orange-700 dark:text-orange-400">
               <Users className="w-5 h-5 mr-2" />
               Agent Satisfaction Matrix
             </h2>

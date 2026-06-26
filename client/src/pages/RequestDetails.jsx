@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
@@ -36,6 +36,14 @@ export default function RequestDetails() {
   const [error, setError] = useState('');
   const [submittingComment, setSubmittingComment] = useState(false);
   
+  const scrollContainerRef = useRef(null);
+  
+  const scrollToBottom = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
+    }
+  };
+
   // Rating states
   const [hoveredRating, setHoveredRating] = useState(0);
   const [submittingRating, setSubmittingRating] = useState(false);
@@ -94,6 +102,10 @@ export default function RequestDetails() {
     ];
     return items.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
   };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [comments, activities]);
 
   const handlePostComment = async (e) => {
     e.preventDefault();
@@ -302,7 +314,10 @@ export default function RequestDetails() {
             </h3>
 
             {/* Feed timeline box */}
-            <div className="glass-panel p-6 rounded-3xl bg-card/45 shadow-sm space-y-6 max-h-[500px] overflow-y-auto">
+            <div 
+              ref={scrollContainerRef}
+              className="glass-panel p-6 rounded-3xl bg-card/45 shadow-sm space-y-6 max-h-[500px] overflow-y-auto"
+            >
               {timeline.length === 0 ? (
                 <div className="text-center py-10">
                   <p className="text-muted-foreground text-sm">No activity logs or comments recorded yet.</p>

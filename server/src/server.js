@@ -146,6 +146,10 @@ app.use('/api/dashboard', dashboardRoutes);
 const notificationRoutes = require('./routes/notification.routes');
 app.use('/api/notifications', notificationRoutes);
 
+// Admin routes — user and request management
+const adminRoutes = require('./routes/admin.routes');
+app.use('/api/admin', adminRoutes);
+
 // Serve the uploads directory statically so files can be accessed or downloaded
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 

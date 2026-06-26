@@ -148,4 +148,20 @@ router.post('/login', authController.login);
 // Only if the token is valid will it call authController.getMe
 router.get('/me', authenticate, authController.getMe);
 
+/**
+ * @swagger
+ * /auth/me:
+ *   delete:
+ *     summary: Delete the currently logged-in user's account
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Account deleted successfully
+ *       401:
+ *         description: Not authenticated
+ */
+router.delete('/me', authenticate, authController.deleteAccount);
+
 module.exports = router;

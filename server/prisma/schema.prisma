@@ -21,6 +21,7 @@ datasource db {
 enum Role {
   STUDENT
   SUPPORT
+  ADMIN
 }
 
 // The lifecycle of a request — it moves forward, never backward randomly
@@ -89,11 +90,11 @@ model Request {
 
   // The student who opened this request
   studentId   String
-  student     User          @relation("StudentRequests", fields: [studentId], references: [id])
+  student     User          @relation("StudentRequests", fields: [studentId], references: [id], onDelete: Cascade)
 
   // The support rep assigned to handle it (optional — starts as null)
   assignedToId String?
-  assignedTo   User?        @relation("AssignedRequests", fields: [assignedToId], references: [id])
+  assignedTo   User?        @relation("AssignedRequests", fields: [assignedToId], references: [id], onDelete: SetNull)
 
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
@@ -120,7 +121,7 @@ model Comment {
 
   // Who wrote this comment
   authorId   String
-  author     User     @relation(fields: [authorId], references: [id])
+  author     User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
 
   // Which request this comment belongs to
   requestId  String
@@ -139,7 +140,7 @@ model Attachment {
 
   // Who uploaded this file
   uploadedById String
-  uploadedBy   User    @relation(fields: [uploadedById], references: [id])
+  uploadedBy   User    @relation(fields: [uploadedById], references: [id], onDelete: Cascade)
 
   // Which request this file belongs to
   requestId    String
@@ -158,7 +159,7 @@ model Activity {
 
   // Which user caused this activity
   userId      String
-  user        User     @relation(fields: [userId], references: [id])
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   // Which request this activity belongs to
   requestId   String
@@ -177,7 +178,7 @@ model Notification {
 
   // Who receives this notification
   userId    String
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   // Which request triggered it (optional)
   requestId String?
@@ -193,7 +194,7 @@ model SatisfactionRating {
 
   // Which student submitted the rating
   studentId String
-  student   User     @relation(fields: [studentId], references: [id])
+  student   User     @relation(fields: [studentId], references: [id], onDelete: Cascade)
 
   // Which request is being rated — one request can only have one rating
   requestId String   @unique

@@ -25,7 +25,7 @@ export default function ProtectedRoute({ allowedRoles }) {
   // 3. Unauthorized role redirect
   if (allowedRoles && !allowedRoles.includes(user.role)) {
     // Fallback path based on role
-    const fallbackPath = user.role === 'SUPPORT' ? '/support' : '/student';
+    const fallbackPath = user.role === 'ADMIN' ? '/admin' : (user.role === 'SUPPORT' ? '/support' : '/student');
     return <Navigate to={fallbackPath} replace />;
   }
 

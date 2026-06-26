@@ -16,20 +16,28 @@ import SupportDashboard from './pages/SupportDashboard';
 import SupportRequests from './pages/SupportRequests';
 import SupportRequestDetails from './pages/SupportRequestDetails';
 import Unauthorized from './pages/Unauthorized';
+import AdminDashboard from './pages/AdminDashboard';
 
 export default function App() {
   const { user } = useAuth();
+
+  // Helper to determine home page based on role
+  const getHomeRoute = (role) => {
+    if (role === 'ADMIN') return '/admin';
+    if (role === 'SUPPORT') return '/support';
+    return '/student';
+  };
 
   return (
     <Routes>
       {/* Public Pages: If already logged in, redirect straight to role dashboards */}
       <Route 
         path="/login" 
-        element={!user ? <Login /> : <Navigate to={user.role === 'SUPPORT' ? '/support' : '/student'} replace />} 
+        element={!user ? <Login /> : <Navigate to={getHomeRoute(user.role)} replace />} 
       />
       <Route 
         path="/register" 
-        element={!user ? <Register /> : <Navigate to={user.role === 'SUPPORT' ? '/support' : '/student'} replace />} 
+        element={!user ? <Register /> : <Navigate to={getHomeRoute(user.role)} replace />} 
       />
       <Route path="/verify-email" element={<VerifyEmail />} />
       <Route path="/unauthorized" element={<Unauthorized />} />
@@ -53,12 +61,19 @@ export default function App() {
         </Route>
       </Route>
 
+      {/* Protected Admin Layout Group */}
+      <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
+        <Route element={<LayoutWrapper />}>
+          <Route path="/admin" element={<AdminDashboard />} />
+        </Route>
+      </Route>
+
       {/* Root redirect: redirects to dashboard or login depending on login status */}
       <Route
         path="/"
         element={
           user ? (
-            <Navigate to={user.role === 'SUPPORT' ? '/support' : '/student'} replace />
+            <Navigate to={getHomeRoute(user.role)} replace />
           ) : (
             <Navigate to="/login" replace />
           )
