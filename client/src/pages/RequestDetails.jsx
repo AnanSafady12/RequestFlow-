@@ -257,7 +257,8 @@ export default function RequestDetails() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {request.attachments.map((file) => {
                     const isImage = file.mimetype && file.mimetype.startsWith('image/');
-                    const fileUrl = `http://localhost:3000/uploads/${file.filename}`;
+                    const baseUrl = import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL.replace('/api', '') : 'http://localhost:3000';
+                    const fileUrl = `${baseUrl}/uploads/${file.filename}`;
                     
                     return (
                       <a 
