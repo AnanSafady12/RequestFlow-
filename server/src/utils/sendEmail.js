@@ -20,10 +20,10 @@ if (isEmailConfigured) {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASS,
     },
-    // Prevent 5-minute hang if Render's Free Tier firewall drops SMTP packets
-    connectionTimeout: 3000,
-    greetingTimeout: 3000,
-    socketTimeout: 3000,
+    // 10 second timeout for SMTP connection
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 10000,
   });
 }
 
