@@ -30,6 +30,18 @@ if (isEmailConfigured) {
  * @param {string} userName - the user's name (used in the greeting)
  */
 async function sendVerificationEmail(toEmail, code, userName) {
+  // Always print to the console logs in a clean visual card
+  console.log('\n┌────────────────────────────────────────────────────────┐');
+  console.log('│ 🎓 REQUESTFLOW LOCAL DEV MAIL FALLBACK                  │');
+  console.log(`│ To: ${toEmail.padEnd(51 - toEmail.length)}│`);
+  console.log(`│ Name: ${userName.padEnd(49 - userName.length)}│`);
+  console.log('│                                                        │');
+  console.log(`│ Your 6-Digit Email Verification Code:                  │`);
+  console.log(`│               👉  ${code}  👈                               │`);
+  console.log('│                                                        │');
+  console.log('│ (Paste this code in the email verification UI)         │');
+  console.log('└────────────────────────────────────────────────────────┘\n');
+
   if (isEmailConfigured && transporter) {
     const mailOptions = {
       from: process.env.EMAIL_FROM || 'RequestFlow <noreply@gmail.com>',
@@ -67,18 +79,6 @@ async function sendVerificationEmail(toEmail, code, userName) {
       `,
     };
     await transporter.sendMail(mailOptions);
-  } else {
-    // Fallback: print to the console logs in a clean visual card
-    console.log('\n┌────────────────────────────────────────────────────────┐');
-    console.log('│ 🎓 REQUESTFLOW LOCAL DEV MAIL FALLBACK                  │');
-    console.log(`│ To: ${toEmail.padEnd(51 - toEmail.length)}│`);
-    console.log(`│ Name: ${userName.padEnd(49 - userName.length)}│`);
-    console.log('│                                                        │');
-    console.log(`│ Your 6-Digit Email Verification Code:                  │`);
-    console.log(`│               👉  ${code}  👈                               │`);
-    console.log('│                                                        │');
-    console.log('│ (Paste this code in the email verification UI)         │');
-    console.log('└────────────────────────────────────────────────────────┘\n');
   }
 }
 
@@ -91,6 +91,14 @@ async function sendVerificationEmail(toEmail, code, userName) {
  */
 async function sendStatusUpdateEmail(toEmail, userName, requestTitle, newStatus) {
   const readableStatus = newStatus.replace('_', ' ');
+
+  // Fallback: print to console
+  console.log('\n┌────────────────────────────────────────────────────────┐');
+  console.log('│ 🎓 REQUESTFLOW LOCAL DEV MAIL FALLBACK                  │');
+  console.log(`│ To: ${toEmail.padEnd(51 - toEmail.length)}│`);
+  console.log(`│ Ticket: "${requestTitle.substring(0, 30)}${requestTitle.length > 30 ? '...' : ''}"`.padEnd(57) + '│');
+  console.log(`│ Status Update: ${readableStatus.padEnd(40 - readableStatus.length)}│`);
+  console.log('└────────────────────────────────────────────────────────┘\n');
 
   if (isEmailConfigured && transporter) {
     const mailOptions = {
@@ -113,14 +121,6 @@ async function sendStatusUpdateEmail(toEmail, userName, requestTitle, newStatus)
       `,
     };
     await transporter.sendMail(mailOptions);
-  } else {
-    // Fallback: print to console
-    console.log('\n┌────────────────────────────────────────────────────────┐');
-    console.log('│ 🎓 REQUESTFLOW LOCAL DEV MAIL FALLBACK                  │');
-    console.log(`│ To: ${toEmail.padEnd(51 - toEmail.length)}│`);
-    console.log(`│ Ticket: "${requestTitle.substring(0, 30)}${requestTitle.length > 30 ? '...' : ''}"`.padEnd(57) + '│');
-    console.log(`│ Status Update: ${readableStatus.padEnd(40 - readableStatus.length)}│`);
-    console.log('└────────────────────────────────────────────────────────┘\n');
   }
 }
 
