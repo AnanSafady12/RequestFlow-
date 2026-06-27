@@ -1,2 +1,0 @@
-# uploads folder — stores files that students attach to their requests
-# this folder is excluded from git and AI tools (see .gitignore and .aiexclude)
